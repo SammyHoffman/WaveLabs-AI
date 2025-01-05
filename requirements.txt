@@ -1,0 +1,23 @@
+# requirements.txt
+# Install with: pip install -r requirements.txt
+
+# For downloading from YouTube/SoundCloud
+yt-dlp
+
+# For audio metadata reading and editing
+mutagen
+
+# For sending HTTP requests to external APIs
+requests
+
+# For image operations (cropping, resizing, etc.)
+Pillow
+
+# For loading environment variables from a .env file
+python-dotenv
+
+# For time zone conversions (e.g., scheduling Mixcloud uploads)
+pytz
+
+# For trashing files instead of permanently deleting
+Send2Trash
