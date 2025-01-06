@@ -5,6 +5,6 @@ You can leave this empty or use it to define imports accessible at the
 'modules.download' package level.
 """
 
-# Example of exposing some imports:
-# from .downloader import download_track
-# from .post_process import organize_downloads
+# # modules/download/__init__.py
+from .downloader import process_links_from_file, process_links_interactively
+from .post_process import organize_downloads

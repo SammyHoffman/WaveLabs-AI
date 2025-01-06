@@ -26,4 +26,4 @@ SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET", "")
 
 # Additional configuration toggles
 USE_COLOR_LOGS = True   # Set to False if you want plain text logs without color
-DEBUG_MODE = False      # If True, shows more verbose logging info
+DEBUG_MODE = True      # If True, shows more verbose logging info

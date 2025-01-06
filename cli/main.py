@@ -13,7 +13,12 @@ various parts of the DJ automation pipeline:
 import argparse
 import sys
 import os
-# from modules.download.downloader import process_links_from_file, process_links_interactively
+# print("sys.path:", sys.path)
+# print("Current working directory:", os.getcwd())
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+from modules.download.downloader import process_links_from_file, process_links_interactively
 from modules.download.post_process import organize_downloads
 # from modules.covers.ai_cover_generator import generate_cover
 # from modules.mixcloud.uploader import upload_to_mixcloud
