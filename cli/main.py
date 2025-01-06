@@ -23,6 +23,7 @@ if project_root not in sys.path:
 # 2) Now import your modules
 from modules.download.downloader import process_links_from_file, process_links_interactively
 from modules.download.post_process import organize_downloads
+from mixcloud_cli import handle_upload_subcommand
 # from modules.covers.ai_cover_generator import generate_cover
 # from modules.mixcloud.uploader import upload_to_mixcloud
 from core.color_utils import (
@@ -97,9 +98,10 @@ def setup_argparser():
     # Placeholder for future subcommands
     # covers_parser = subparsers.add_parser("covers", help="Generate AI covers")
     # covers_parser.add_argument("--prompt", help="Text prompt for AI cover generation")
-    #
-    # upload_parser = subparsers.add_parser("upload", help="Upload to Mixcloud")
-    # upload_parser.add_argument("--file", help="Path to the audio file or folder to upload")
+
+    # UPLOAD (Mixcloud)
+    upload_parser = subparsers.add_parser("upload", help="Upload to Mixcloud")
+    upload_parser.add_argument("--file", help="Path to the audio file to upload")
 
     return parser
 
@@ -123,6 +125,10 @@ def main():
     if args.command == "download":
         print(f"{MSG_STATUS}Starting 'download' subcommand...")
         handle_download_subcommand(args)
+
+    elif args.command == "upload":
+        print(f"{MSG_STATUS}Starting 'upload' subcommand...")
+        handle_upload_subcommand(args)
 
     # elif args.command == "covers":
     #     if args.prompt:
