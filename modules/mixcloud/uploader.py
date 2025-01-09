@@ -33,48 +33,47 @@ project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(_
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-# Imports from config/settings and core/color_utils
+# Imports from config.settings
 from config.settings import (
+    # Logging toggles
     DEBUG_MODE as DEBUG,
+
+    # Mixcloud Credentials / Config
     MIXCLOUD_CLIENT_ID as CLIENT_ID,
     MIXCLOUD_CLIENT_SECRET as CLIENT_SECRET,
-    APIS,
+    MIXCLOUD_PRO_USER as PRO_USER,
+    MIXCLOUD_PORT,
+    MIXCLOUD_REDIRECT_URI,
+    MIXCLOUD_AUTH_URL,
+    MIXCLOUD_ENABLED,
+    # Track/Cover Paths + Upload Lists
     USE_EXTERNAL_TRACK_DIR,
     LOCAL_TRACK_DIR,
     EXTERNAL_TRACK_DIR,
     COVER_IMAGE_DIRECTORY,
     FINISHED_DIRECTORY,
     TITLES_FILE,
-    DJ_POOL_BASE_PATH,  # if needed
-)
-from config.settings import (
-    DOWNLOAD_FOLDER_NAME, LINKS_FILE  # if needed
-)
-# If you have additional settings (like PUBLISHED_DATES, TAGS, etc.), add them too:
-from config.settings import (
-    MIXCLOUD_PRO_USER as PRO_USER,
+    UPLOAD_LINKS_FILE,
+    PUBLISHED_DATES,
     MAX_UPLOADS,
     PUBLISHED_HOUR,
     PUBLISHED_MINUTE,
     TRACK_TAGS
 )
+
+# Additional optional references (if you want them):
+# from config.settings import DJ_POOL_BASE_PATH, DOWNLOAD_FOLDER_NAME, LINKS_FILE
+
+# Colored logs
 from core.color_utils import (
-    MSG_ERROR, MSG_NOTICE, MSG_DEBUG, MSG_SUCCESS, MSG_STATUS, MSG_WARNING, LINE_BREAK, 
-    COLOR_RED, COLOR_GREEN, COLOR_YELLOW, COLOR_BLUE, COLOR_CYAN, COLOR_RESET
+    MSG_ERROR, MSG_NOTICE, MSG_DEBUG, MSG_SUCCESS,
+    MSG_STATUS, MSG_WARNING, LINE_BREAK,
+    COLOR_RED, COLOR_GREEN, COLOR_YELLOW,
+    COLOR_BLUE, COLOR_CYAN, COLOR_RESET
 )
 
-# Hardcode or retrieve if placed in settings.py
-PORT = int(os.getenv("MIXCLOUD_PORT", 8001))
-REDIRECT_URI = f"http://localhost:{PORT}/"
-AUTH_URL = f"https://www.mixcloud.com/oauth/authorize?client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}"
-
-# Example external file references
-UPLOAD_LINKS_FILE = "uploadLinks.txt"
-PUBLISHED_DATES_FILE = os.getenv("PUBLISHED_DATES", "/Users/haleakala/Documents/PythonAutomation/AutomaticSoundCloudUpload/dates.txt")
-
-# Global
+# Global Access Token (set after OAuth)
 ACCESS_TOKEN = None
-
 
 #########################################################
 #                 GENERIC HELPERS
@@ -87,6 +86,16 @@ def extract_number(filename: str):
 
 def extract_date_from_filename(filename: str):
     match = re.search(r'(\d{4}-\d{2}-\d{2})', filename)
+    if match:
+        try:
+            return datetime.datetime.strptime(match.group(1), "%Y-%m-%d")
+        except ValueError:
+            return None
+    return None
+
+
+def extract_date_from_url(url: str):
+    match = re.search(r'(\d{4}-\d{2}-\d{2})', url)
     if match:
         try:
             return datetime.datetime.strptime(match.group(1), "%Y-%m-%d")
@@ -142,12 +151,14 @@ class OAuthHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Content-type", "text/html")
         self.end_headers()
 
-        # Simple HTML response
-        response_html = f"""
-        <html><head><title>Mixcloud OAuth</title></head>
+        response_html = """
+        <html>
+        <head><title>Mixcloud OAuth</title></head>
         <body style="text-align:center;font-family:sans-serif;padding-top:20vh;">
-        <h1 style="color:#00ff00;">Authorization Successful</h1>
-        <p>You can close this window now.</p></body></html>
+            <h1 style="color:#00ff00;">Authorization Successful</h1>
+            <p>You can close this window now.</p>
+        </body>
+        </html>
         """
         self.wfile.write(response_html.encode("utf-8"))
 
@@ -165,10 +176,14 @@ def get_access_token(auth_code: str):
     """
     Exchanges code for an access token. 
     """
+    if not MIXCLOUD_ENABLED or not CLIENT_ID or not CLIENT_SECRET:
+        print(f"{MSG_ERROR}Mixcloud not fully configured. Check your .env or settings.")
+        return None
+
     token_url = "https://www.mixcloud.com/oauth/access_token"
     payload = {
         "client_id": CLIENT_ID,
-        "redirect_uri": REDIRECT_URI,
+        "redirect_uri": MIXCLOUD_REDIRECT_URI,
         "client_secret": CLIENT_SECRET,
         "code": auth_code,
         "grant_type": "authorization_code"
@@ -184,9 +199,12 @@ def get_access_token(auth_code: str):
 
 
 def start_oauth_server():
-    with socketserver.TCPServer(("", PORT), OAuthHandler) as httpd:
-        print(f"{MSG_STATUS}Starting OAuth server at http://localhost:{PORT}/")
-        webbrowser.open(AUTH_URL)
+    if not MIXCLOUD_ENABLED:
+        print(f"{MSG_WARNING}Mixcloud is disabled. OAuth server will not start.")
+        return
+    with socketserver.TCPServer(("", MIXCLOUD_PORT), OAuthHandler) as httpd:
+        print(f"{MSG_STATUS}Starting OAuth server at {MIXCLOUD_REDIRECT_URI}")
+        webbrowser.open(MIXCLOUD_AUTH_URL)
         httpd.serve_forever()
 
 
@@ -211,8 +229,7 @@ def sort_tracks_by_date(files):
     for f in files:
         dt = extract_date_from_filename(os.path.basename(f)) or datetime.datetime.max
         with_dates.append((f, dt))
-    sorted_files = [fp for fp, dt in sorted(with_dates, key=lambda x: x[1])]
-    return sorted_files
+    return [fp for fp, dt in sorted(with_dates, key=lambda x: x[1])]
 
 
 def sort_cover_images_by_mix_number(files):
@@ -220,8 +237,7 @@ def sort_cover_images_by_mix_number(files):
     for f in files:
         num = extract_number(os.path.basename(f))
         with_nums.append((f, num))
-    sorted_files = [fp for fp, n in sorted(with_nums, key=lambda x: x[1])]
-    return sorted_files
+    return [fp for fp, n in sorted(with_nums, key=lambda x: x[1])]
 
 
 #########################################################
@@ -260,20 +276,6 @@ def load_titles_descriptions(titles_file: str):
     except Exception as e:
         print(f"{MSG_ERROR}Error reading {titles_file}: {e}")
         return []
-
-
-#########################################################
-#         GET LAST UPLOADED / TRACK NUMBER
-#########################################################
-
-def extract_date_from_url(url: str):
-    match = re.search(r'(\d{4}-\d{2}-\d{2})', url)
-    if match:
-        try:
-            return datetime.datetime.strptime(match.group(1), "%Y-%m-%d")
-        except ValueError:
-            return None
-    return None
 
 
 def get_last_uploaded_date(links_file: str):
@@ -323,7 +325,7 @@ def display_upload_info(track_files, cover_images, published_dates, start_mix, t
                 cimg = cov
                 break
 
-        pd = published_dates[i] if i < len(published_dates) else "No publish date"
+        pub_d = published_dates[i] if i < len(published_dates) else "No publish date"
         dt = extract_date_from_filename(os.path.basename(track_fp))
         date_str = dt.strftime("%Y-%m-%d") if dt else None
         if date_str:
@@ -335,7 +337,7 @@ def display_upload_info(track_files, cover_images, published_dates, start_mix, t
         print(f"{MSG_NOTICE}  File:        {track_fp}")
         print(f"{MSG_NOTICE}  Cover Image: {cimg if cimg else 'No cover'}")
         print(f"{MSG_NOTICE}  Name:        {track_name}")
-        print(f"{MSG_NOTICE}  Publish Date:{pd}")
+        print(f"{MSG_NOTICE}  Publish Date:{pub_d}")
         print("------")
 
 
@@ -343,9 +345,10 @@ def upload_track(
     file_path, cover_path, mix_number, title, description, publish_date=None, remove_files=True
 ):
     """
-    Actually uploads the track to Mixcloud.
+    Actually uploads the track to Mixcloud, referencing global ACCESS_TOKEN.
     """
     global ACCESS_TOKEN
+
     dt = extract_date_from_filename(os.path.basename(file_path))
     date_str = dt.strftime("%Y-%m-%d") if dt else None
     if date_str:
@@ -358,6 +361,7 @@ def upload_track(
         "name": track_name,
         "description": description
     }
+    # Add up to 5 tags from TRACK_TAGS
     for idx, tg in enumerate(TRACK_TAGS):
         data[f"tags-{idx}-tag"] = tg
         if idx >= 4:
@@ -392,10 +396,7 @@ def upload_track(
             if not DEBUG and remove_files:
                 move_to_finished(file_path, cover_path, FINISHED_DIRECTORY)
 
-            # Remove first line from published dates file
-            remove_first_line(PUBLISHED_DATES_FILE)
-
-            # Log the upload link
+            remove_first_line(PUBLISHED_DATES)
             result_data = resp.json()
             up_key = result_data.get("result", {}).get("key", "")
             if up_key:
@@ -427,7 +428,6 @@ def upload_track(
         if "picture" in files:
             files["picture"].close()
 
-
 #########################################################
 #              MAIN EXECUTION
 #########################################################
@@ -438,6 +438,11 @@ def main():
     and uploading in a single run.
     """
     global ACCESS_TOKEN
+
+    # If Mixcloud is disabled, skip
+    if not MIXCLOUD_ENABLED:
+        print(f"{MSG_WARNING}Mixcloud is disabled in config. Exiting.")
+        sys.exit(0)
 
     # Start OAuth in a thread
     t = threading.Thread(target=start_oauth_server)
@@ -477,7 +482,10 @@ def main():
     print(f"{MSG_STATUS}Next expected mix # => {next_mixnum}")
 
     last_date = get_last_uploaded_date(UPLOAD_LINKS_FILE)
-    print(f"{MSG_STATUS}Last uploaded date => {last_date.strftime('%Y-%m-%d') if last_date else 'None'}")
+    if last_date:
+        print(f"{MSG_STATUS}Last uploaded date => {last_date.strftime('%Y-%m-%d')}")
+    else:
+        print(f"{MSG_STATUS}No last uploaded date found.")
 
     start_mix = next_mixnum
 
@@ -488,7 +496,7 @@ def main():
     )
 
     # Published dates
-    published_dates = parse_published_dates_from_file(PUBLISHED_DATES_FILE)
+    published_dates = parse_published_dates_from_file(PUBLISHED_DATES)
 
     # Determine track list
     if USE_EXTERNAL_TRACK_DIR:
@@ -540,9 +548,13 @@ def main():
                 cpath = cimg
                 break
 
-        pubd = published_dates[i] if i < len(published_dates) else None
+        pub_date = published_dates[i] if i < len(published_dates) else None
         print(f"{MSG_STATUS}Uploading Track {i+1}/{total} => {track_fp}")
-        result = upload_track(track_fp, cpath, mix_num, selected_title, selected_description, pubd, remove_files=remove_after)
+        result = upload_track(
+            track_fp, cpath, mix_num, 
+            selected_title, selected_description,
+            publish_date=pub_date, remove_files=remove_after
+        )
 
         if result is True:
             i += 1
@@ -556,11 +568,3 @@ def main():
             i += 1
 
     print(f"{MSG_SUCCESS}All uploads completed.")
-
-
-#########################################################
-#               ENTRY POINT
-#########################################################
-
-if __name__ == "__main__":
-    main()

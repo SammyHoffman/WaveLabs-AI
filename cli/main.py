@@ -7,8 +7,10 @@ various parts of the DJ automation pipeline:
 - Download
 - Post-process
 - AI cover generation (future)
-- Mixcloud upload (future)
+- Mixcloud upload
 - Etc.
+
+Now includes a "test" subcommand referencing cli/test_cli.py.
 """
 
 import argparse
@@ -20,16 +22,14 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-# 2) Now import your modules
+# 2) Import your modules
 from modules.download.downloader import process_links_from_file, process_links_interactively
 from modules.download.post_process import organize_downloads
-from mixcloud_cli import handle_upload_subcommand
-# from modules.covers.ai_cover_generator import generate_cover
-# from modules.mixcloud.uploader import upload_to_mixcloud
+from mixcloud_cli import handle_mixcloud_subcommand
 from core.color_utils import (
-    COLOR_GREEN, COLOR_CYAN, COLOR_RESET, MSG_STATUS, MSG_NOTICE, MSG_WARNING, MSG_ERROR, MSG_SUCCESS, LINE_BREAK
+    COLOR_GREEN, COLOR_CYAN, COLOR_RESET,
+    MSG_STATUS, MSG_NOTICE, MSG_WARNING, MSG_ERROR, MSG_SUCCESS, LINE_BREAK
 )
-
 
 def banner():
     """
@@ -95,14 +95,21 @@ def setup_argparser():
         help="Organize files after downloading."
     )
 
-    # Placeholder for future subcommands
-    # covers_parser = subparsers.add_parser("covers", help="Generate AI covers")
-    # covers_parser.add_argument("--prompt", help="Text prompt for AI cover generation")
+    # Mixcloud Upload Subcommand (matches the subcommand in mixcloud_cli)
+    upload_parser = subparsers.add_parser("upload", help="Upload multiple tracks to Mixcloud.")
 
-    # UPLOAD (Mixcloud)
-    upload_parser = subparsers.add_parser("upload", help="Upload to Mixcloud")
-    upload_parser.add_argument("--file", help="Path to the audio file to upload")
-
+    # Test Subcommand - references a new file in cli/test_cli.py
+    test_parser = subparsers.add_parser("test", help="Run internal debug checks or custom tests")
+    test_parser.add_argument(
+        "--mixcloud",
+        action="store_true",
+        help="Run Mixcloud-specific tests (tests/test_mixcloud.py)"
+    )
+    test_parser.add_argument(
+        "--download",
+        action="store_true",
+        help="Run download-specific tests (tests/test_download.py)"
+    )
     return parser
 
 
@@ -111,14 +118,12 @@ def main():
     Main function to orchestrate the DJ automation pipeline.
     """
     add_project_root_to_path()
-    # Print a banner on startup
     print(banner())
 
     parser = setup_argparser()
     args = parser.parse_args()
 
     if not args.command:
-        # No subcommand provided, just show help
         parser.print_help()
         return
 
@@ -128,21 +133,12 @@ def main():
 
     elif args.command == "upload":
         print(f"{MSG_STATUS}Starting 'upload' subcommand...")
-        handle_upload_subcommand(args)
+        handle_mixcloud_subcommand(args)
 
-    # elif args.command == "covers":
-    #     if args.prompt:
-    #         print(f"{MSG_STATUS}Generating AI cover with prompt: {args.prompt}")
-    #         generate_cover(args.prompt)
-    #     else:
-    #         print(f"{MSG_WARNING}No prompt provided for AI cover generation.")
-    #
-    # elif args.command == "upload":
-    #     if args.file:
-    #         print(f"{MSG_STATUS}Uploading file/folder: {args.file} to Mixcloud...")
-    #         upload_to_mixcloud(args.file)
-    #     else:
-    #         print(f"{MSG_WARNING}No file specified for upload.")
+    elif args.command == "test":
+        print(f"{MSG_STATUS}Running custom tests or debug checks...")
+        from cli.test_cli import handle_test_subcommand
+        handle_test_subcommand(args)
 
     else:
         print(f"{MSG_ERROR}Unknown subcommand: {args.command}")
