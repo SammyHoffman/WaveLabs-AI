@@ -44,10 +44,10 @@ def download_track(link, output_dir, quality="320"):
 
             if downloaded_file_path and os.path.exists(downloaded_file_path):
                 print(f"{MSG_SUCCESS}Downloaded file: {downloaded_file_path}")
-                return downloaded_file_path
+                return downloaded_file_path, info_dict
             else:
                 print(f"{MSG_ERROR}File not found after download. Possibly a postprocessing error.")
-                return None
+                return None, info_dict
 
     except Exception as e:
         if DEBUG_MODE:
