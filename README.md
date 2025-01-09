@@ -114,11 +114,8 @@ Centralized configuration file that imports environment variables and sets defau
 ### 📌 Key Settings
 
 • **Paths**: Directories for tracks, covers, finished uploads, etc.
-
 • **API Credentials**: Client IDs and secrets for Mixcloud, Spotify, etc.
-
 • **Upload Parameters**: Maximum uploads per run, publish times, and tags.
-
 • **Toggles**: Enable or disable features like Mixcloud integration and color logs.
 
 ---
@@ -145,9 +142,7 @@ Centralized configuration file that imports environment variables and sets defau
 ### ☁️ Mixcloud Module (modules/mixcloud/)
 
 • **uploader.py**: Manages the uploading of tracks to Mixcloud, including handling OAuth authentication and file uploads.
-
 • **scheduler.py**: (Future) Implements scheduling logic to automate upload timings.
-
 • **cli.py**: Contains CLI-specific functions for Mixcloud integration.
 
 ### 🎨 Core Module (core/)
@@ -157,7 +152,6 @@ Centralized configuration file that imports environment variables and sets defau
 ### 🛠️ Configuration (config/)
 
 • **settings.py**: Centralized configuration file importing environment variables and setting default values.
-
 • **mixcloud/settings.py**: Mixcloud-specific configurations, including API credentials and upload parameters.
 
 ### 🧪 Tests (tests/)
