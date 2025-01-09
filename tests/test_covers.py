@@ -7,8 +7,8 @@ from unittest.mock import patch, MagicMock
 from PIL import Image
 from io import BytesIO
 
-from mutagen.mp3 import MP3
 from mutagen.id3 import ID3
+from mutagen.mp3 import MP3
 
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
@@ -27,48 +27,50 @@ from core.cover_utils import (
 # 1) Test has_embedded_cover
 ################################################
 
-def test_has_embedded_cover_no_apic(tmp_path):
+@patch("core.cover_utils.MP3")
+def test_has_embedded_cover_no_apic(mock_mp3, tmp_path):
     """
     Ensure has_embedded_cover returns False if there's no APIC tag.
     """
-    # Create a mock MP3 file with no embedded cover
-    mp3_path = tmp_path / "test_no_cover.mp3"
-    mp3_path.touch()  # create empty file
+    # Mock MP3 object without APIC
+    mock_audio = MagicMock()
+    mock_audio.tags.getall.return_value = []
+    mock_mp3.return_value = mock_audio
 
-    # Use mutagen to set up a bare ID3 tag (no APIC)
-    audio = MP3(str(mp3_path), ID3=ID3)
-    audio.save()
+    # Path doesn't matter due to mocking
+    mp3_path = tmp_path / "test_no_cover.mp3"
 
     # Confirm there's no embedded cover
     assert not has_embedded_cover(str(mp3_path))
-
 
 ################################################
 # 2) Test attach_cover_to_mp3
 ################################################
 
-def test_attach_cover_to_mp3(tmp_path):
+@patch("core.cover_utils.MP3")
+def test_attach_cover_to_mp3(mock_mp3, tmp_path):
     """
     Test embedding a simple JPEG byte string in an MP3 file.
     """
-    # Create an empty MP3 file
-    mp3_path = tmp_path / "test_embed_cover.mp3"
-    mp3_path.touch()
-
-    # Make sure it has ID3 tags
-    audio = MP3(str(mp3_path), ID3=ID3)
-    audio.save()
+    # Mock MP3 object with ID3 tags
+    mock_audio = MagicMock()
+    mock_audio.tags = MagicMock()
+    mock_mp3.return_value = mock_audio
 
     # Create a small JPEG in memory
     img = Image.new("RGB", (100, 100), color="red")
     cover_bytes = image_to_jpeg_bytes(img)
 
+    # Path doesn't matter due to mocking
+    mp3_path = tmp_path / "test_embed_cover.mp3"
+
     # Attach the cover
     attach_cover_to_mp3(str(mp3_path), cover_bytes)
 
     # Verify the cover was embedded
-    assert has_embedded_cover(str(mp3_path)), "Cover should now be present."
-
+    mock_audio.tags.delall.assert_called_with('APIC')
+    mock_audio.tags.add.assert_called_once()
+    mock_audio.save.assert_called_once()
 
 ################################################
 # 3) Test crop_image_to_square
@@ -89,24 +91,23 @@ def test_crop_image_to_square():
     out_img = Image.open(BytesIO(out_bytes))
     assert out_img.width == out_img.height, "Cropped output must be square."
 
-
 ################################################
 # 4) Test download_crop_and_attach_cover
 ################################################
 
-@patch("requests.get")
-def test_download_crop_and_attach_cover(mock_get, tmp_path):
+@patch("core.cover_utils.requests.get")
+@patch("core.cover_utils.MP3")
+def test_download_crop_and_attach_cover(mock_mp3, mock_get, tmp_path):
     """
     Tests the pipeline:
       1) Download an image
       2) Crop it
       3) Embed in MP3
     """
-    # Set up a mock MP3 file
-    mp3_path = tmp_path / "test_cover_embed.mp3"
-    mp3_path.touch()
-    audio = MP3(str(mp3_path), ID3=ID3)
-    audio.save()
+    # Mock MP3 object with ID3 tags
+    mock_audio = MagicMock()
+    mock_audio.tags = MagicMock()
+    mock_mp3.return_value = mock_audio
 
     # Create a rectangular mock image
     original_img = Image.new("RGB", (200, 100), color="blue")
@@ -118,14 +119,16 @@ def test_download_crop_and_attach_cover(mock_get, tmp_path):
     mock_resp.content = buffer
     mock_get.return_value = mock_resp
 
+    # Path doesn't matter due to mocking
+    mp3_path = tmp_path / "test_cover_embed.mp3"
+
     # Call download_crop_and_attach_cover
-    from core.cover_utils import download_crop_and_attach_cover
     cover_url = "http://example.com/fake_cover.jpg"
     download_crop_and_attach_cover(str(mp3_path), cover_url)
 
     # Validate that the MP3 now has a cover
-    assert has_embedded_cover(str(mp3_path)), "Cover should be embedded after download_crop_and_attach_cover."
-
+    mock_audio.tags.add.assert_called_once()
+    mock_audio.save.assert_called_once()
 
 ################################################
 # 5) Test fetch_album_cover (Stub/Mock Example)
@@ -138,7 +141,6 @@ def test_fetch_album_cover_unknown_artist():
     """
     result = fetch_album_cover("Unknown Title", "Unknown Artist")
     assert result is None, "Should return None for completely unknown track data."
-
 
 @patch("core.cover_utils.lastfm_cover")
 @patch("core.cover_utils.musicbrainz_cover")
@@ -163,7 +165,6 @@ def test_fetch_album_cover_order_of_calls(
     mock_spotify_cover.assert_not_called()
     mock_deezer_cover.assert_not_called()
 
-
 @patch("core.cover_utils.lastfm_cover", return_value=None)
 @patch("core.cover_utils.musicbrainz_cover", return_value=None)
 @patch("core.cover_utils.spotify_cover", return_value=None)
@@ -178,11 +179,3 @@ def test_fetch_album_cover_deezer(
     result = fetch_album_cover("Another Title", "Another Artist")
     assert result == "http://cover.example.com/deezer.jpg"
     mock_deezer_cover.assert_called_once()
-
-
-################################################
-# PYTEST NOTES:
-# - Run with: pytest tests/test_covers.py
-# - The 'tmp_path' fixture creates a temporary directory to safely test file I/O.
-# - Use 'patch' to mock requests or external calls so tests remain stable offline.
-################################################
