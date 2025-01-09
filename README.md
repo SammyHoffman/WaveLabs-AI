@@ -18,12 +18,23 @@ Welcome to the **DJ Automation CLI**! This powerful tool streamlines your DJ wor
     - [🛠️ config/settings.py](#️-configsettingspy)
     - [📌 Key Settings](#-key-settings)
   - [🚀 Installation](#-installation)
+  - [🔧 Usage](#-usage)
+    - [📥 Download Tracks](#-download-tracks)
+    - [🎵 Upload to Mixcloud](#-upload-to-mixcloud)
+    - [🧪 Run Tests](#-run-tests)
+      - [Run All Tests:](#run-all-tests)
+      - [Run Mixcloud Tests Only:](#run-mixcloud-tests-only)
+- [🧪 Custom Testing](#-custom-testing)
   - [📚 Modules Overview](#-modules-overview)
     - [🔍 Download Module (modules/download/)](#-download-module-modulesdownload)
     - [☁️ Mixcloud Module (modules/mixcloud/)](#️-mixcloud-module-modulesmixcloud)
     - [🎨 Core Module (core/)](#-core-module-core)
     - [🛠️ Configuration (config/)](#️-configuration-config)
     - [🧪 Tests (tests/)](#-tests-tests)
+- [🔒 Security](#-security)
+- [📞 Support](#-support)
+- [📝 License](#-license)
+- [🙏 Contributing](#-contributing)
 
 ---
 
@@ -128,9 +139,80 @@ Centralized configuration file that imports environment variables and sets defau
 1. Clone the Repository:
 
    ```
-   git clone https://github.com/yourusername/DJAutomation.git
+   git clone https://github.com/Katazui/DJAutomation.git
    cd DJAutomation
    ```
+
+2. **Create a Virtual Environment** (optional but recommended):
+
+   ```
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+
+3. **Install Dependencies**:
+
+   ```
+   pip install -r requirements.txt
+   ```
+
+4. **Configure Environment Variables**:
+
+   • Create a `.env` file in the root directory.
+
+   • Populate it with the necessary credentials and paths as shown in the **Configuration** section.
+
+---
+
+## 🔧 Usage
+
+### 📥 Download Tracks
+
+### 🎵 Upload to Mixcloud
+
+### 🧪 Run Tests
+
+Run all tests or specific ones (e.g. Mixcloud tests, Album Cover, Downloads, etc).
+
+#### Run All Tests:
+
+```
+python cli/main.py test
+```
+
+#### Run Mixcloud Tests Only:
+
+```
+python cli/main.py test --mixcloud
+```
+
+---
+
+# 🧪 Custom Testing
+
+Ensure your codebase remains robust by running automated tests.
+
+1. **Run Tests via CLI**:
+
+```
+python cli/main.py test
+```
+
+• **All Tests**: Executes all tests in the `tests/` directory.
+
+• **Specific Tests**: Use flags like `--mixcloud` to run targeted tests.
+
+2. **Run Tests Directly with Pytest**:
+
+```
+pytest tests/
+```
+
+3. **Adding New Tests**:
+
+• Create new test files in the `tests/` directory following the `test_*.py` nameing convention.
+
+• Ensure your tests cover different modukles and functionalities.
 
 ---
 
@@ -138,28 +220,84 @@ Centralized configuration file that imports environment variables and sets defau
 
 ### 🔍 Download Module (modules/download/)
 
-• **downloader.py**: Handles downloading audio tracks from provided links. Supports interactive and file-based modes.
+• `downloader.py`: Handles downloading audio tracks from provided links. Supports interactive and file-based modes.
 
-• **post_process.py**: Organizes downloaded files into structured directories for easy management.
+• `post_process.py`: Organizes downloaded files into structured directories for easy management.
 
 ### ☁️ Mixcloud Module (modules/mixcloud/)
 
-• **uploader.py**: Manages the uploading of tracks to Mixcloud, including handling OAuth authentication and file uploads.
+• `uploader.py`: Manages the uploading of tracks to Mixcloud, including handling OAuth authentication and file uploads.
 
-• **scheduler.py**: (Future) Implements scheduling logic to automate upload timings.
+• `scheduler.py`: (Future) Implements scheduling logic to automate upload timings.
 
-• **cli.py**: Contains CLI-specific functions for Mixcloud integration.
+• `cli.py`: Contains CLI-specific functions for Mixcloud integration.
 
 ### 🎨 Core Module (core/)
 
-• **color_utils.py**: Provides utilities for color-coded messages in the CLI, enhancing readability and user experience.
+• `color_utils.py`: Provides utilities for color-coded messages in the CLI, enhancing readability and user experience.
 
 ### 🛠️ Configuration (config/)
 
-• **settings.py**: Centralized configuration file importing environment variables and setting default values.
+• `settings.py`: Centralized configuration file importing environment variables and setting default values.
 
-• **mixcloud/settings.py**: Mixcloud-specific configurations, including API credentials and upload parameters.
+• `mixcloud/settings.py`: Mixcloud-specific configurations, including API credentials and upload parameters.
 
 ### 🧪 Tests (tests/)
 
-• **test_mixcloud.py**: Contains unit and integration tests for the Mixcloud uploader module, ensuring reliability and correctness.
+• `test_mixcloud.py`: Contains unit and integration tests for the Mixcloud uploader module, ensuring reliability and correctness.
+
+---
+
+# 🔒 Security
+
+• **Sensitive Data**: All sensitive credentials (API keys, secrets) are stored in the `.env` file and **never** committed to version control.
+
+• `.gitignore`: Ensure your `.env` file is listed in `.gitignore` to prevent accidental exposure.
+
+---
+
+# 📞 Support
+
+If you encouynter any issues or have questions, feel free to reach out:
+
+• **Email**: FootLong@Duck.com
+
+• **GitHub Issues:** Open an Issue
+
+---
+
+# 📝 License
+
+This project is licensed under the MIt License. See the LICENSE file for details.
+
+---
+
+# 🙏 Contributing
+
+Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.
+
+1. **Fork the Repository.**
+
+2. **Create a Feature Branch:**
+
+```
+git checkout -b feature/YourFeature
+```
+
+3. **Commit Your Changes:**
+
+```
+git commit -m "Add Your Feature Name"
+```
+
+4. **Push to the Branch**:
+
+```
+git push origin feature/YourFeature
+```
+
+5. **Open a Pull Request.**
+
+---
+
+Stay tuned for more features and improvements! Thank you for using DJ Automation CLI. 🎉

@@ -489,6 +489,17 @@ def main():
 
     start_mix = next_mixnum
 
+    # Ask user if the next mix number is correct
+    inp = input(f"{MSG_NOTICE}Start from Mix #{start_mix}? (y/n): ").lower()
+    if inp != "y":
+        try:
+            start_mix = int(input(f"{MSG_NOTICE}Enter a new starting mix number: "))
+        except ValueError:
+            print(f"{MSG_WARNING}Invalid input. Using default => {next_mixnum}")
+            start_mix = next_mixnum
+    if inp == "y" and start_mix != next_mixnum:
+        print(f"{MSG_WARNING}Starting from mix #{start_mix} instead of {next_mixnum}")
+
     # Covers
     cover_imgs = sort_cover_images_by_mix_number(
         glob.glob(os.path.join(COVER_IMAGE_DIRECTORY, "*.png")) +
