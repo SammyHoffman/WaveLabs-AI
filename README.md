@@ -1,6 +1,6 @@
 # 🎧 DJ Automation CLI
 
-![DJ Automation Banner](https://your-image-link.com/banner.png)
+![DJ Automation Banner](https://katazui.com/wp-content/uploads/2023/07/Katazui-Logo-1-300x188.png)
 
 Welcome to the **DJ Automation CLI**! This powerful tool streamlines your DJ workflow by automating tasks such as downloading tracks, organizing files, generating AI covers, and uploading mixes to Mixcloud. Whether you're managing a personal collection or handling large-scale uploads, this CLI has got you covered. 🚀
 
@@ -142,25 +142,26 @@ Centralized configuration file that imports environment variables and sets defau
 git clone https://github.com/yourusername/DJAutomation.git
 cd DJAutomation
 ```
+
 ---
 
 ## 📚 Modules Overview
 
 🔍 Download Module (modules/download/)
-	•	downloader.py: Handles downloading audio tracks from provided links. Supports interactive and file-based modes.
-	•	post_process.py: Organizes downloaded files into structured directories for easy management.
+• downloader.py: Handles downloading audio tracks from provided links. Supports interactive and file-based modes.
+• post_process.py: Organizes downloaded files into structured directories for easy management.
 
 ☁️ Mixcloud Module (modules/mixcloud/)
-	•	uploader.py: Manages the uploading of tracks to Mixcloud, including handling OAuth authentication and file uploads.
-	•	scheduler.py: (Future) Implements scheduling logic to automate upload timings.
-	•	cli.py: Contains CLI-specific functions for Mixcloud integration.
+• uploader.py: Manages the uploading of tracks to Mixcloud, including handling OAuth authentication and file uploads.
+• scheduler.py: (Future) Implements scheduling logic to automate upload timings.
+• cli.py: Contains CLI-specific functions for Mixcloud integration.
 
 🎨 Core Module (core/)
-	•	color_utils.py: Provides utilities for color-coded messages in the CLI, enhancing readability and user experience.
+• color_utils.py: Provides utilities for color-coded messages in the CLI, enhancing readability and user experience.
 
 🛠️ Configuration (config/)
-	•	settings.py: Centralized configuration file importing environment variables and setting default values.
-	•	mixcloud/settings.py: Mixcloud-specific configurations, including API credentials and upload parameters.
+• settings.py: Centralized configuration file importing environment variables and setting default values.
+• mixcloud/settings.py: Mixcloud-specific configurations, including API credentials and upload parameters.
 
 🧪 Tests (tests/)
-	•	test_mixcloud.py: Contains unit and integration tests for the Mixcloud uploader module, ensuring reliability and correctness.
+• test_mixcloud.py: Contains unit and integration tests for the Mixcloud uploader module, ensuring reliability and correctness.
