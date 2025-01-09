@@ -1,4 +1,5 @@
 # 🎧 DJ Automation CLI
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 ![DJ Automation Banner](https://katazui.com/wp-content/uploads/2023/07/Katazui-Logo-1-300x188.png)
 
@@ -168,7 +169,11 @@ Centralized configuration file that imports environment variables and sets defau
 
 ### 📥 Download Tracks
 
+***TODO***
+
 ### 🎵 Upload to Mixcloud
+
+***TODO***
 
 ### 🧪 Run Tests
 
@@ -262,13 +267,13 @@ If you encouynter any issues or have questions, feel free to reach out:
 
 • **Email**: FootLong@Duck.com
 
-• **GitHub Issues:** Open an Issue
+• **GitHub Issues:** [Open an Issue](https://github.com/Katazui/DJAutomation/issues/new/choose)
 
 ---
 
 # 📝 License
 
-This project is licensed under the MIt License. See the LICENSE file for details.
+This project is licensed under the [MIT](https://opensource.org/license/MIT) License. See the LICENSE file for details.
 
 ---
 
