@@ -1,8 +1,8 @@
 """
 config/settings.py
 
-Central location for non-sensitive configuration and environment variables.
-Sensitive credentials (Mixcloud, Spotify, Last.fm, etc.) belong in .env only.
+Central location for both general settings and Mixcloud-specific configurations.
+Sensitive credentials (Mixcloud, Spotify, Last.fm, etc.) should be in .env only.
 """
 
 import os
@@ -13,62 +13,79 @@ from dotenv import load_dotenv
 #             LOAD .ENV FILE VARIABLES (IF PRESENT)
 # ----------------------------------------------------------------
 
-# This makes any environment variables in .env accessible via os.getenv(...)
-# Make sure .env is in your .gitignore so secrets aren't committed.
+# Make sure .env is in your .gitignore, so secrets aren’t committed.
 load_dotenv()
-
-# For clarity, print out the current path if debugging:
-# print("Settings loaded from:", __file__)
-# print("Python version:", sys.version)
-
 
 # ----------------------------------------------------------------
 #      NON-SENSITIVE CONFIGURATIONS & PATHS
 # ----------------------------------------------------------------
 
-# Base path for where your DJ Pool or music library is stored.
-# Default points to a relative path for testing; override via DJ_POOL_BASE_PATH in .env.
 DJ_POOL_BASE_PATH = os.getenv("DJ_POOL_BASE_PATH", os.path.abspath("./tests/test_download/"))
-
-# Directory containing the initial downloaded files (before organization).
 DOWNLOAD_FOLDER_NAME = os.getenv("DOWNLOAD_FOLDER_NAME", "audio_320")
-
-# File that holds links for the batch download.
 LINKS_FILE = os.getenv("LINKS_FILE", "links.txt")
-
 
 # ----------------------------------------------------------------
 #          LOGGING & GENERAL TOGGLES
 # ----------------------------------------------------------------
 
-# If True, terminal output uses ANSI color codes (use False for plain text).
 USE_COLOR_LOGS = os.getenv("USE_COLOR_LOGS", "True").strip().lower() == "true"
-
-# If True, shows more verbose logging info for debugging.
 DEBUG_MODE = os.getenv("DEBUG_MODE", "False").strip().lower() == "true"
 
-
 # ----------------------------------------------------------------
-#       SENSITIVE CREDENTIALS LOADED FROM .ENV
+#   MIXCLOUD + OTHER SENSITIVE CREDENTIALS (FROM .ENV)
 # ----------------------------------------------------------------
 
-# Mixcloud (example)
 MIXCLOUD_CLIENT_ID = os.getenv("MIXCLOUD_CLIENT_ID", "")
 MIXCLOUD_CLIENT_SECRET = os.getenv("MIXCLOUD_CLIENT_SECRET", "")
 
-# Spotify
 SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID", "")
 SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET", "")
 
-# Last.fm
 LASTFM_API_KEY = os.getenv("LASTFM_API_KEY", "")
-
-# Deezer
 DEEZER_API_KEY = os.getenv("DEEZER_API_KEY", "")
-
-# MusicBrainz
 MUSICBRAINZ_API_TOKEN = os.getenv("MUSICBRAINZ_API_TOKEN", "")
 
+# ----------------------------------------------------------------
+#   MIXCLOUD SETTINGS
+# ----------------------------------------------------------------
+
+# Example toggles or parameters for your Mixcloud logic:
+MIXCLOUD_ENABLED = True  # If you disable it, code won’t attempt uploads
+MIXCLOUD_PORT = int(os.getenv("MIXCLOUD_PORT", "8001"))
+MIXCLOUD_REDIRECT_URI = f"http://localhost:{MIXCLOUD_PORT}/"
+MIXCLOUD_AUTH_URL = (
+    "https://www.mixcloud.com/oauth/authorize"
+    f"?client_id={MIXCLOUD_CLIENT_ID}&redirect_uri={MIXCLOUD_REDIRECT_URI}"
+)
+
+# If you’re a Mixcloud Pro user, can schedule uploads
+MIXCLOUD_PRO_USER = True
+
+# Optional paths or toggles for track & cover uploads
+USE_EXTERNAL_TRACK_DIR = os.getenv("USE_EXTERNAL_TRACK_DIR", "True").strip().lower() == "true"
+LOCAL_TRACK_DIR = os.getenv("LOCAL_TRACK_DIR", "/Users/haleakala/Documents/PythonAutomation/AutomaticSoundCloudUpload/tracks/")
+EXTERNAL_TRACK_DIR = os.getenv("EXTERNAL_TRACK_DIR", "/Volumes/DJKatazui-W/DJ Mixes")
+COVER_IMAGE_DIRECTORY = os.getenv("COVER_IMAGE_DIRECTORY", "/Users/haleakala/Documents/PythonAutomation/AutomaticSoundCloudUpload/images/")
+FINISHED_DIRECTORY = os.getenv("FINISHED_DIRECTORY", "/Users/haleakala/Documents/PythonAutomation/AutomaticSoundCloudUpload/finished/")
+PUBLISHED_DATES = os.getenv("PUBLISHED_DATES", "/Users/haleakala/Documents/PythonAutomation/AutomaticSoundCloudUpload/dates.txt")
+TITLES_FILE = os.getenv("TITLES_FILE", "/Users/haleakala/Documents/PythonAutomation/AutomaticSoundCloudUpload/titles.csv")
+UPLOAD_LINKS_FILE = os.getenv("UPLOAD_LINKS_FILE", "uploadLinks.txt")  # Where you store uploaded URLs
+
+# Max tracks to upload per run
+MAX_UPLOADS = int(os.getenv("MAX_UPLOADS", "8"))
+
+# Publish Time (for scheduled uploads)
+PUBLISHED_HOUR = int(os.getenv("PUBLISHED_HOUR", "12"))
+PUBLISHED_MINUTE = int(os.getenv("PUBLISHED_MINUTE", "00"))
+
+# Mixcloud track tags (max 5)
+TRACK_TAGS = [
+    "Open Format",
+    "Disc Jockey",
+    "Live Performance",
+    "Katazui",
+    "Archive"
+]
 
 # ----------------------------------------------------------------
 #   OPTIONAL: APIS DICTIONARY FOR CENTRALIZED API ENDPOINTS
@@ -99,36 +116,29 @@ APIS = {
         "api_token": MUSICBRAINZ_API_TOKEN,
     },
     "mixcloud": {
-        "enabled": True,
+        "enabled": MIXCLOUD_ENABLED,
         "client_id": MIXCLOUD_CLIENT_ID,
         "client_secret": MIXCLOUD_CLIENT_SECRET,
-        # ... any additional Mixcloud endpoints if needed
+        "auth_url": MIXCLOUD_AUTH_URL,
+        # Additional endpoints or keys if needed
     },
 }
 
-# For any other APIs (e.g., YouTube, SoundCloud), you can add entries here:
-# APIS["youtube"] = {...}
-# APIS["soundcloud"] = {...}
-
-
 # ----------------------------------------------------------------
-#   ADVISORY ABOUT STORING API CREDENTIALS IN .ENV ONLY
+#   REMINDER FOR STORING CREDENTIALS
 # ----------------------------------------------------------------
 """
-All sensitive credentials (e.g. MIXCLOUD_CLIENT_ID, SPOTIFY_CLIENT_ID, LASTFM_API_KEY, etc.)
-are retrieved exclusively from .env to avoid exposing them in source control.
+All sensitive credentials (Mixcloud, Spotify, Last.fm, etc.) 
+are read from .env to avoid committing secrets to source control.
+Make sure your .env is in .gitignore and never pushed publicly.
 
-Ensure .env is NOT committed to GitHub or any public repository.
+Sample .env fields:
 
-Examples in your .env:
-
-    MIXCLOUD_CLIENT_ID=""
-    MIXCLOUD_CLIENT_SECRET=""
-
-    SPOTIFY_CLIENT_ID=""
-    SPOTIFY_CLIENT_SECRET=""
-
-    LASTFM_API_KEY=""
-    DEEZER_API_KEY=""
-    MUSICBRAINZ_API_TOKEN=""
+MIXCLOUD_CLIENT_ID=""
+MIXCLOUD_CLIENT_SECRET=""
+SPOTIFY_CLIENT_ID=""
+SPOTIFY_CLIENT_SECRET=""
+LASTFM_API_KEY=""
+DEEZER_API_KEY=""
+MUSICBRAINZ_API_TOKEN=""
 """
