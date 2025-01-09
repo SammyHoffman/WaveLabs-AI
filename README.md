@@ -2,7 +2,15 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Python Tests](https://github.com/Katazui/DJAutomation/actions/workflows/python-tests.yml/badge.svg)
-![Commits](https://github.com/Katazui/DJAutomation/commits)
+![Commit Activity](https://img.shields.io/github/commit-activity/m/Katazui/DJAutomation.svg)
+![GitHub Pull Requests](https://img.shields.io/github/issues-pr/Katazui/DJAutomation.svg)
+![GitHub issues](https://img.shields.io/github/issues/Katazui/DJAutomation.svg)
+![GitHub contributors](https://img.shields.io/github/contributors/Katazui/DJAutomation.svg)
+![GitHub forks](https://img.shields.io/github/forks/Katazui/DJAutomation.svg?style=social&label=Fork)
+![GitHub stars](https://img.shields.io/github/stars/Katazui/DJAutomation.svg?style=social&label=Stars)
+![Issues Closed](https://img.shields.io/github/issues-closed/Katazui/DJAutomation.svg)
+![GitHub release](https://img.shields.io/github/release/Katazui/DJAutomation.svg)
+![Repo Size](https://img.shields.io/github/repo-size/Katazui/DJAutomation.svg)
 
 ![DJ Automation Banner](https://katazui.com/wp-content/uploads/2023/07/Katazui-Logo-1-300x188.png)
 
