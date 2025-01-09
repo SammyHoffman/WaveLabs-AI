@@ -285,7 +285,7 @@ If you encouynter any issues or have questions, feel free to reach out:
 
 # 📝 License
 
-This project is licensed under the [MIT](https://opensource.org/license/MIT) License. See the LICENSE file for details.
+This project is licensed under the [MIT](https://opensource.org/license/MIT) License. See the [LICENSE](https://github.com/Katazui/DJAutomation?tab=MIT-1-ov-file#) file for details.
 
 ---
 
