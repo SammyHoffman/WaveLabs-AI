@@ -28,6 +28,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Set up environment variables
+        env:
+          MIXCLOUD_CLIENT_ID: ${{ secrets.MIXCLOUD_CLIENT_ID }}
+          MIXCLOUD_CLIENT_SECRET: ${{ secrets.MIXCLOUD_CLIENT_SECRET }}
+        run: |
+          echo "MIXCLOUD_CLIENT_ID=${MIXCLOUD_CLIENT_ID}" >> $GITHUB_ENV
+          echo "MIXCLOUD_CLIENT_SECRET=${MIXCLOUD_CLIENT_SECRET}" >> $GITHUB_ENV
+
       - name: Run tests
         run: |
-          pytest tests/test_mixcloud.py
+          pytest tests/
