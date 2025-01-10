@@ -99,3 +99,5 @@ output/
 
 # Except the .gitkeep file
 !/content/.gitkeep
+
+/uploadLinks.txt
