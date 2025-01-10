@@ -93,3 +93,9 @@ downloads/
 temp/
 cache/
 output/
+
+# Ignore all contents within the content/ folder
+/content/*
+
+# Except the .gitkeep file
+!/content/.gitkeep

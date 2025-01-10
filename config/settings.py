@@ -125,6 +125,23 @@ APIS = {
 }
 
 # ----------------------------------------------------------------
+#   PEXEL API CONFIGURATION
+# ----------------------------------------------------------------
+
+# Pexels Configuration
+PEXEL_API_KEY = os.getenv('PEXEL_API_KEY', '')
+PEXEL_API_URL = 'https://api.pexels.com/v1/search'
+
+# Tags for Photo Search
+TAGS = [
+    'minimalist', 'simple background', 'clean background', 'abstract', 'white background', 'black background',
+    'nature', 'landscape', 'mountains', 'forest', 'sky', 'sea', 'beach', 'sunset', 'sunrise', 'desert',
+    'cityscape', 'urban', 'architecture', 'buildings', 'skyline', 'street',
+    'texture', 'pattern', 'fabric', 'wood', 'marble', 'brick', 'concrete', 'metal',
+    'gradient', 'blurred background', 'soft colors', 'pastel colors', 'bokeh', 'aesthetic', 'empty space'
+]
+
+# ----------------------------------------------------------------
 #   REMINDER FOR STORING CREDENTIALS
 # ----------------------------------------------------------------
 """
