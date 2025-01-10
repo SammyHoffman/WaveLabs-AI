@@ -100,4 +100,5 @@ output/
 # Except the .gitkeep file
 !/content/.gitkeep
 
+# Ignore all user-generated files
 /uploadLinks.txt
