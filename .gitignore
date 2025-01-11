@@ -94,11 +94,18 @@ temp/
 cache/
 output/
 
-# Ignore all contents within the content/ folder
+# Ignore everything in /content
 /content/*
 
-# Except the .gitkeep file
+# Keep the .gitkeep file
 !/content/.gitkeep
+
+# Keep the download directory
+!/content/download/
+
+# Keep the specific file
+!/content/download/musicLinks.txt
 
 # Ignore all user-generated files
 /uploadLinks.txt
+

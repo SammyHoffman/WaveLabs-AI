@@ -22,7 +22,7 @@ load_dotenv()
 
 DJ_POOL_BASE_PATH = os.getenv("DJ_POOL_BASE_PATH", os.path.abspath("./tests/test_download/"))
 DOWNLOAD_FOLDER_NAME = os.getenv("DOWNLOAD_FOLDER_NAME", "/Users/haleakala/Downloads/")
-LINKS_FILE = os.getenv("LINKS_FILE", "links.txt") # TODO: Refactor a Clearer Name
+LINKS_FILE = os.getenv("LINKS_FILE", "/content/download/musicLinks.txt") # TODO: Refactor a Clearer Name
 
 # ----------------------------------------------------------------
 #          LOGGING & GENERAL TOGGLES
