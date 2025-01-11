@@ -21,8 +21,8 @@ load_dotenv()
 # ----------------------------------------------------------------
 
 DJ_POOL_BASE_PATH = os.getenv("DJ_POOL_BASE_PATH", os.path.abspath("./tests/test_download/"))
-DOWNLOAD_FOLDER_NAME = os.getenv("DOWNLOAD_FOLDER_NAME", "audio_320")
-LINKS_FILE = os.getenv("LINKS_FILE", "links.txt")
+DOWNLOAD_FOLDER_NAME = os.getenv("DOWNLOAD_FOLDER_NAME", "/Users/haleakala/Downloads/")
+LINKS_FILE = os.getenv("LINKS_FILE", "links.txt") # TODO: Refactor a Clearer Name
 
 # ----------------------------------------------------------------
 #          LOGGING & GENERAL TOGGLES
@@ -69,7 +69,7 @@ COVER_IMAGE_DIRECTORY = os.getenv("COVER_IMAGE_DIRECTORY", "/Users/haleakala/Doc
 FINISHED_DIRECTORY = os.getenv("FINISHED_DIRECTORY", "/Users/haleakala/Documents/PythonAutomation/AutomaticSoundCloudUpload/finished/")
 PUBLISHED_DATES = os.getenv("PUBLISHED_DATES", "/Users/haleakala/Documents/PythonAutomation/AutomaticSoundCloudUpload/dates.txt")
 TITLES_FILE = os.getenv("TITLES_FILE", "/Users/haleakala/Documents/PythonAutomation/AutomaticSoundCloudUpload/titles.csv")
-UPLOAD_LINKS_FILE = os.getenv("UPLOAD_LINKS_FILE", "uploadLinks.txt")  # Where you store uploaded URLs
+UPLOAD_LINKS_FILE = os.getenv("UPLOAD_LINKS_FILE", "content/mixcloudContent/uploadLinks.txt")  # Where you store uploaded URLs
 
 # Max tracks to upload per run
 MAX_UPLOADS = int(os.getenv("MAX_UPLOADS", "8"))
@@ -132,8 +132,8 @@ APIS = {
 PEXEL_API_KEY = os.getenv('PEXEL_API_KEY', '')
 PEXEL_API_URL = 'https://api.pexels.com/v1/search'
 
-# Tags for Photo Search
-TAGS = [
+# Tags for Photo Search 
+TAGS = [ # TODO: Refactor a Clearer Name
     'minimalist', 'simple background', 'clean background', 'abstract', 'white background', 'black background',
     'nature', 'landscape', 'mountains', 'forest', 'sky', 'sea', 'beach', 'sunset', 'sunrise', 'desert',
     'cityscape', 'urban', 'architecture', 'buildings', 'skyline', 'street',

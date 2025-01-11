@@ -95,7 +95,8 @@ def setup_argparser():
     Sets up the argument parser and subcommands.
     """
     parser = argparse.ArgumentParser(
-        description="Main pipeline for DJ automation.",
+        prog="djcli",
+        description="https://github.com/Katazui/DJAutomation",
         epilog=f"{COLOR_GREEN}Tip:{COLOR_RESET} Try 'download_music --mode file --organize' or 'download_pexel --num_photos 10' to run specific processes."
     )
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
