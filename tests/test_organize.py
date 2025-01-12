@@ -1,17 +1,17 @@
-# tests/test_organize_cli.py
+# tests/test_organize.py
 
 import os
 import sys
 import pytest
 from unittest.mock import patch, MagicMock
 
-# Adjust path so Python can import `cli.organize_cli`
+# Ensure Python can find 'cli/organize_cli'
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-# Import the CLI entry point
 from cli.organize_cli import main as organize_main
+from config.settings import DOWNLOAD_FOLDER_NAME  # <-- Import the setting used by the CLI
 
 ################################################
 # 1) Test when --requested is specified
@@ -35,11 +35,15 @@ def test_organize_cli_requested(
     with patch.object(sys, "argv", test_argv):
         organize_main()
 
-    # The script should print a notice about organizing requested songs
-    assert any("Organizing only requested songs" in call_args[0][0] for call_args in mock_print.call_args_list)
-    # Each file in the download folder should be moved with the 'requested_songs' function
-    mock_move_func.assert_any_call(os.path.join("downloads", "song1.mp3"))
-    mock_move_func.assert_any_call(os.path.join("downloads", "song2.mp3"))
+    # Check CLI output
+    assert any(
+        "Organizing only requested songs" in call_args[0][0]
+        for call_args in mock_print.call_args_list
+    )
+
+    # Each file in the download folder should be moved
+    mock_move_func.assert_any_call(os.path.join(DOWNLOAD_FOLDER_NAME, "song1.mp3"))
+    mock_move_func.assert_any_call(os.path.join(DOWNLOAD_FOLDER_NAME, "song2.mp3"))
     assert mock_move_func.call_count == 2
 
 ################################################
@@ -61,8 +65,12 @@ def test_organize_cli_default_mode(
     with patch.object(sys, "argv", test_argv):
         organize_main()
 
-    # The script should print a notice about organizing all downloaded files
-    assert any("Organizing all downloaded files" in call_args[0][0] for call_args in mock_print.call_args_list)
+    # Check CLI output
+    assert any(
+        "Organizing all downloaded files" in call_args[0][0]
+        for call_args in mock_print.call_args_list
+    )
+
     # Should call the standard organize_downloads function
     mock_organize_downloads.assert_called_once()
 
@@ -84,4 +92,7 @@ def test_organize_cli_no_download_folder(
         organize_main()
 
     # Check for a warning about missing download folder
-    assert any("not found" in call_args[0][0] for call_args in mock_print.call_args_list)
+    assert any(
+        "not found" in call_args[0][0]
+        for call_args in mock_print.call_args_list
+    )
