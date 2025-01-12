@@ -105,7 +105,4 @@ output/
 
 # Keep the specific file
 !/content/download/musicLinks.txt
-
-# Ignore all user-generated files
-/uploadLinks.txt
-
+!/content/mixcloudContent/uploadLinks.txt
