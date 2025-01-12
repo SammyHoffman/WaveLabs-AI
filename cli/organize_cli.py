@@ -1,12 +1,12 @@
 """
 cli/organize_cli.py
 
-Base template for a CLI script that triggers organizing tasks.
+CLI script that triggers the newly enhanced organizing tasks with folder strategy prompts.
 """
 
 import argparse
 import os
-from modules.organize.organize_files import organize_downloads, move_to_date_based_folder_requested_songs
+from modules.organize.organize_files import organize_downloads
 from core.color_utils import MSG_NOTICE, MSG_WARNING
 from config.settings import DOWNLOAD_FOLDER_NAME
 
@@ -17,7 +17,7 @@ def main():
     parser.add_argument(
         "--requested",
         action="store_true",
-        help="Organizes only requested songs into a date-based folder under 'Requested Songs'."
+        help="Organizes songs as 'Requested,' affecting the date-based folder path."
     )
 
     args = parser.parse_args()
@@ -28,14 +28,10 @@ def main():
 
     if args.requested:
         print(f"{MSG_NOTICE}Organizing only requested songs...")
-        # Loop over files in DOWNLOAD_FOLDER_NAME to move them individually.
-        for f in os.listdir(DOWNLOAD_FOLDER_NAME):
-            file_path = os.path.join(DOWNLOAD_FOLDER_NAME, f)
-            if os.path.isfile(file_path):
-                move_to_date_based_folder_requested_songs(file_path)
+        organize_downloads(requested=True)
     else:
         print(f"{MSG_NOTICE}Organizing all downloaded files...")
-        organize_downloads()
+        organize_downloads(requested=False)
 
 if __name__ == "__main__":
     main()

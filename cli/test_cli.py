@@ -65,18 +65,37 @@ def handle_download_tests():
     print(f"{MSG_SUCCESS}Download tests completed.")
 
 
+import subprocess
+import os
+from core.color_utils import (
+    MSG_ERROR, MSG_SUCCESS, MSG_STATUS
+)
+
 def run_all_tests():
     """
-    Runs all available tests.
+    Runs all available tests in the `tests/` folder using Pytest.
+    Uses an absolute path to avoid 'file or directory not found' issues.
     """
-    print(f"{MSG_STATUS}Running all tests...")
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(current_dir)
+    tests_path = os.path.join(project_root, "tests")
+
+    print(f"{MSG_STATUS}Running all tests from: {tests_path}")
+
+    if not os.path.isdir(tests_path):
+        print(f"{MSG_ERROR}Tests directory not found at '{tests_path}'. Aborting.")
+        return
+
     try:
-        # Runs pytest for all tests in the `tests/` directory.
-        result = subprocess.run(["pytest", "tests/"], check=False)
+        result = subprocess.run(["pytest", tests_path], check=False)
         if result.returncode == 0:
             print(f"{MSG_SUCCESS}All tests passed.")
         else:
             print(f"{MSG_ERROR}Some tests encountered failures. Return code: {result.returncode}")
     except FileNotFoundError:
+        # Pytest might not be installed or not on PATH
         print(f"{MSG_ERROR}Pytest not found. Please install it or adjust the command.")
+    except Exception as e:
+        print(f"{MSG_ERROR}Unexpected error running tests: {str(e)}")
+
     print(f"{MSG_SUCCESS}All tests completed.")
