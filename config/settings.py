@@ -20,9 +20,29 @@ load_dotenv()
 #      NON-SENSITIVE CONFIGURATIONS & PATHS
 # ----------------------------------------------------------------
 
-DJ_POOL_BASE_PATH = os.getenv("DJ_POOL_BASE_PATH", os.path.abspath("./tests/test_download/"))
-DOWNLOAD_FOLDER_NAME = os.getenv("DOWNLOAD_FOLDER_NAME", "/Users/haleakala/Downloads/")
-LINKS_FILE = os.getenv("LINKS_FILE", "/content/download/musicLinks.txt") # TODO: Refactor a Clearer Name
+CONFIG_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(CONFIG_DIR)
+
+DJ_POOL_BASE_PATH = os.environ.get(
+    "DJ_POOL_BASE_PATH",
+    os.path.join(PROJECT_ROOT, "content", "download", "download_music")
+)
+
+
+DOWNLOAD_FOLDER_NAME = os.environ.get(
+    "DOWNLOAD_FOLDER_NAME",
+    os.path.expanduser("~/Downloads")
+)
+
+# ----------------------------------------------------------------
+#      DOWNLOADING CONFUGURATION & PATHS
+# ----------------------------------------------------------------
+
+# Path to store downloaded music links
+LINKS_FILE = os.environ.get(
+    "LINKS_FILE",
+    os.path.join(PROJECT_ROOT, "content", "download", "musicLinks.txt")
+) # TODO: Refactor a Clearer Name
 
 # ----------------------------------------------------------------
 #          LOGGING & GENERAL TOGGLES

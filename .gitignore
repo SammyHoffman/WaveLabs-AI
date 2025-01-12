@@ -104,8 +104,8 @@ output/
 !/content/download/
 
 # Keep the mixcloudContent directory
-!/content/mixcloudContent/
+# !/content/mixcloudContent/
 
 # Keep specific files
-!/content/download/musicLinks.txt
+# !/content/download/musicLinks.txt # File is created by the program
 !/content/mixcloudContent/uploadLinks.txt

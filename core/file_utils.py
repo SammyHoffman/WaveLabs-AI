@@ -32,17 +32,17 @@ def sanitize_filename(name: str) -> str:
 
 def remove_unwanted_brackets(text: str) -> str:
     """
-    Removes bracketed or parenthetical text unless it contains 'feat' or 'featuring'.
-    This helps strip out strings like [Official Video], (Audio Only), etc.
-    But it keeps (feat. Artist) or (featuring Artist).
+    Remove bracketed or parenthetical text unless it contains 'feat' or 'featuring'.
+    This removes [Audio Only], [Official Video], (Official Audio), etc.
+    But keeps (feat. Artist), (featuring Artist).
     """
-    # Remove parentheses that do NOT contain 'feat' or 'featuring'.
+    # Remove parentheses that do NOT contain feat/featuring
     cleaned = re.sub(r'\((?!.*(?:feat|featuring).*).*?\)', '', text, flags=re.IGNORECASE)
 
-    # Remove brackets that do NOT contain 'feat' or 'featuring'.
+    # Remove brackets that do NOT contain feat/featuring
     cleaned = re.sub(r'\[(?!.*(?:feat|featuring).*).*?\]', '', cleaned, flags=re.IGNORECASE)
 
-    # Trim excess whitespace
+    # Trim spaces
     return cleaned.strip()
 
 
