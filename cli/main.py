@@ -68,7 +68,7 @@ def handle_download_music_subcommand(args):
 
     if args.organize:
         print(f"{MSG_NOTICE}Organizing downloaded files...")
-        organize_downloads()
+        organize_downloads(True)
 
 def handle_download_pexel_subcommand(args):
     print(f"{MSG_NOTICE}Starting Pexel photo download...")
@@ -78,9 +78,9 @@ def handle_download_pexel_subcommand(args):
         folder='content/albumCovers/pexel',
         log_file='content/downloaded_pexel_photos.txt'
     )
-    if args.organize:
-        print(f"{MSG_NOTICE}Organizing downloaded photos...")
-        organize_downloads()
+    # if args.organize:
+    #     print(f"{MSG_NOTICE}Organizing downloaded photos...")
+    #     organize_downloads()
 
 def handle_organize_subcommand(args):
     if not os.path.exists(DOWNLOAD_FOLDER_NAME):
