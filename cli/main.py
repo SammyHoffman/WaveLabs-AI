@@ -6,33 +6,39 @@ A base template for a main entry point that can orchestrate
 various parts of the DJ automation pipeline:
 - Download Music
 - Download Pexel Photos
-- Post-process
-- AI cover generation (future)
-- Mixcloud upload
+- Organize Downloads
+- Mixcloud Upload
 - Etc.
 
-Now includes separate `download_music` and `download_pexel` subcommands.
+Note: This version adds an 'organize' subcommand to manage file organization.
 """
 
 import argparse
 import sys
 import os
 
-# 1) Add the project root to sys.path, so Python sees 'core/' and 'modules/' as importable packages
+# 1) Add the project root to sys.path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-# 2) Import your modules
-from modules.download.downloader import process_links_from_file, process_links_interactively
-from modules.download.post_process import organize_downloads
+# 2) Import modules
+from modules.download.downloader import (
+    process_links_from_file,
+    process_links_interactively
+)
 from modules.download.download_pexel import search_and_download_photos
+from modules.organize.organize_files import (
+    organize_downloads,
+    move_to_date_based_folder_requested_songs
+)
 from mixcloud_cli import handle_mixcloud_subcommand
 from core.color_utils import (
     COLOR_GREEN, COLOR_CYAN, COLOR_RESET,
-    MSG_STATUS, MSG_NOTICE, MSG_WARNING, MSG_ERROR, MSG_SUCCESS, LINE_BREAK
+    MSG_STATUS, MSG_NOTICE, MSG_WARNING, MSG_ERROR, LINE_BREAK
 )
-from config.settings import TAGS
+from config.settings import TAGS, DOWNLOAD_FOLDER_NAME
+
 
 def banner():
     """
@@ -50,6 +56,7 @@ def banner():
 ************************************************
 {COLOR_RESET}"""
 
+
 def add_project_root_to_path():
     """
     Ensures the project root is in the Python path, so all imports work correctly.
@@ -61,7 +68,7 @@ def add_project_root_to_path():
 
 def handle_download_music_subcommand(args):
     """
-    Handles the `download_music` subcommand logic.
+    Handles the 'download_music' subcommand logic.
     """
     if args.mode == "interactive":
         process_links_interactively()
@@ -75,24 +82,42 @@ def handle_download_music_subcommand(args):
 
 def handle_download_pexel_subcommand(args):
     """
-    Handles the `download_pexel` subcommand logic.
+    Handles the 'download_pexel' subcommand logic.
     """
-    print(f"{MSG_NOTICE}Starting Pexels photo download...")
+    print(f"{MSG_NOTICE}Starting Pexel photo download...")
     search_and_download_photos(
         tags=TAGS,
         total_photos=args.num_photos,
         folder='content/albumCovers/pexel',
-        log_file='content/downloaded_pexel_photos.txt'  # Corrected path
+        log_file='content/downloaded_pexel_photos.txt'
     )
+    if args.organize:
+        print(f"{MSG_NOTICE}Organizing downloaded photos...")
+        organize_downloads()
 
-    # if args.organize:
-    #     print(f"{MSG_NOTICE}Organizing downloaded photos...")
-    #     organize_downloads()
+
+def handle_organize_subcommand(args):
+    """
+    Handles the 'organize' subcommand logic.
+    """
+    if not os.path.exists(DOWNLOAD_FOLDER_NAME):
+        print(f"{MSG_WARNING}Download folder '{DOWNLOAD_FOLDER_NAME}' not found.")
+        return
+
+    if args.requested:
+        print(f"{MSG_NOTICE}Organizing only requested songs...")
+        for file_name in os.listdir(DOWNLOAD_FOLDER_NAME):
+            file_path = os.path.join(DOWNLOAD_FOLDER_NAME, file_name)
+            if os.path.isfile(file_path):
+                move_to_date_based_folder_requested_songs(file_path)
+    else:
+        print(f"{MSG_NOTICE}Organizing all downloaded files...")
+        organize_downloads()
 
 
 def setup_argparser():
     """
-    Sets up the argument parser and subcommands.
+    Sets up the argument parser and all subcommands.
     """
     parser = argparse.ArgumentParser(
         prog="djcli",
@@ -101,7 +126,7 @@ def setup_argparser():
     )
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
-    # Download Music Subcommand
+    # Download Music
     download_music_parser = subparsers.add_parser("download_music", help="Download audio from links.")
     download_music_parser.add_argument(
         "--mode",
@@ -115,35 +140,44 @@ def setup_argparser():
         help="Organize files after downloading."
     )
 
-    # Download Pexels Subcommand
-    download_pexel_parser = subparsers.add_parser("download_pexel", help="Download photos from Pexels based on predefined tags.")
+    # Download Pexel
+    download_pexel_parser = subparsers.add_parser("download_pexel", help="Download photos from Pexel API.")
     download_pexel_parser.add_argument(
         "--num_photos",
         type=int,
         default=5,
         help="Number of photos to download per tag. Default is 5."
     )
-    download_pexel_parser.add_argument(
-        "--organize",
+    # download_pexel_parser.add_argument(
+    #     "--organize",
+    #     action="store_true",
+    #     help="Organize photos after downloading."
+    # )
+
+    # Organize
+    organize_parser = subparsers.add_parser("organize", help="Organize downloaded files.")
+    organize_parser.add_argument(
+        "--requested",
         action="store_true",
-        help="Organize photos after downloading."
+        help="Organize only requested songs."
     )
 
-    # Mixcloud Upload Subcommand (matches the subcommand in mixcloud_cli)
+    # Mixcloud Upload (subcommand from mixcloud_cli)
     upload_parser = subparsers.add_parser("upload", help="Upload multiple tracks to Mixcloud.")
 
-    # Test Subcommand - references a new file in cli/test_cli.py
-    test_parser = subparsers.add_parser("test", help="Run internal debug checks or custom tests")
+    # Testing
+    test_parser = subparsers.add_parser("test", help="Run internal debug checks or custom tests.")
     test_parser.add_argument(
         "--mixcloud",
         action="store_true",
-        help="Run Mixcloud-specific tests (tests/test_mixcloud.py)"
+        help="Run Mixcloud-specific tests (tests/test_mixcloud.py)."
     )
     test_parser.add_argument(
         "--download",
         action="store_true",
-        help="Run download-specific tests (tests/test_download.py)"
+        help="Run download-specific tests (tests/test_download.py)."
     )
+
     return parser
 
 
@@ -162,19 +196,23 @@ def main():
         return
 
     if args.command == "download_music":
-        print(f"{MSG_STATUS}Starting 'download_music' subcommand...")
+        print(f"{MSG_STATUS}Starting 'download_music' subcommand...{LINE_BREAK}")
         handle_download_music_subcommand(args)
 
     elif args.command == "download_pexel":
-        print(f"{MSG_STATUS}Starting 'download_pexel' subcommand...")
+        print(f"{MSG_STATUS}Starting 'download_pexel' subcommand...{LINE_BREAK}")
         handle_download_pexel_subcommand(args)
 
+    elif args.command == "organize":
+        print(f"{MSG_STATUS}Starting 'organize' subcommand...{LINE_BREAK}")
+        handle_organize_subcommand(args)
+
     elif args.command == "upload":
-        print(f"{MSG_STATUS}Starting 'upload' subcommand...")
+        print(f"{MSG_STATUS}Starting 'upload' subcommand...{LINE_BREAK}")
         handle_mixcloud_subcommand(args)
 
     elif args.command == "test":
-        print(f"{MSG_STATUS}Running custom tests or debug checks...")
+        print(f"{MSG_STATUS}Running custom tests or debug checks...{LINE_BREAK}")
         from cli.test_cli import handle_test_subcommand
         handle_test_subcommand(args)
 
