@@ -94,6 +94,12 @@ temp/
 cache/
 output/
 
+# Ignore content/download/download_music/*
+/content/download/download_music/*
+
+# Ignore content/download/download_music/musicLinks.txt
+/content/download/download_music/musicLinks.txt
+
 # Ignore everything in /content
 /content/*
 
@@ -104,8 +110,7 @@ output/
 !/content/download/
 
 # Keep the mixcloudContent directory
-# !/content/mixcloudContent/
+!/content/mixcloudContent/
 
-# Keep specific files
-# !/content/download/musicLinks.txt # File is created by the program
+# Keep the uploadLinks.txt file
 !/content/mixcloudContent/uploadLinks.txt
