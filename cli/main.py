@@ -24,7 +24,7 @@ from modules.download.downloader import (
     process_links_from_file,
     process_links_interactively
 )
-from modules.covers.create_album_cover import main as create_album_covers_main
+from modules.covers.create_album_cover import main as create_album_covers_main, test_run_album_covers
 from modules.download.download_pexel import search_and_download_photos
 from modules.organize.organize_files import organize_downloads
 from mixcloud_cli import handle_mixcloud_subcommand
@@ -115,7 +115,7 @@ def handle_download_music_subcommand(args):
 def handle_download_pexel_subcommand(args):
     one_folder_up = os.path.dirname(USER_CONFIG_FOLDER)
     folder_path = os.path.join(one_folder_up, 'content', 'albumCovers', 'pexel')
-    log_path = os.path.join(one_folder_up, 'content', 'downloaded_pexel_photos.txt')
+    log_path = os.path.join(one_folder_up, 'content', 'albumCovers', 'downloaded_pexel_photos.txt')
     search_and_download_photos(
         tags=TAGS,
         total_photos=args.num_photos,
@@ -136,7 +136,11 @@ def handle_organize_subcommand(args):
         organize_downloads()
 
 def handle_create_album_covers_subcommand(args):
-    create_album_covers_main()
+    if args.test:
+        print(f"{MSG_NOTICE}Running test mode for album covers...")
+        test_run_album_covers()
+    else:
+        create_album_covers_main()
 
 def handle_config_subcommand(args):
     """
@@ -303,6 +307,7 @@ def setup_argparser():
 
     # Covers
     covers_parser = subparsers.add_parser("create_ac", help="Create album covers from images.")
+    covers_parser.add_argument("--test", action="store_true", help="Test mode for creating album covers.")
 
     # Mixcloud Upload
     mixcloud_parser = subparsers.add_parser("up_mixes", help="Upload multiple tracks to Mixcloud.")

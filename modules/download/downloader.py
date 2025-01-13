@@ -195,11 +195,20 @@ def process_links_from_file():
         os.makedirs(dir_path, exist_ok=True)
 
     if not os.path.exists(LINKS_FILE):
-        with open(LINKS_FILE, "w", encoding="utf-8"):
-            pass
-        print(f"{MSG_WARNING}File '{LINKS_FILE}' not found; created a new file.")
-        print(f"{MSG_WARNING}Please add your links to '{LINKS_FILE}' or use interactive mode.")
-        return
+        try:
+            # Create an empty links file
+            with open(LINKS_FILE, "w", encoding="utf-8") as file:
+                file.write("")  # Start with an empty file
+            
+            # Notify the user and provide instructions
+            print(f"{MSG_NOTICE}Created an empty links file: '{LINKS_FILE}'")
+            print(f"{MSG_NOTICE}Add YouTube/SoundCloud links (one per line) to the file and run the script again.")
+            
+        except Exception as e:
+            # Handle any errors during file creation
+            print(f"{MSG_ERROR}Failed to create the links file: {e}")
+    else:
+        print(f"{MSG_STATUS}Links file already exists: '{LINKS_FILE}'")
 
     with open(LINKS_FILE, "r", encoding="utf-8") as f:
         links = [line.strip() for line in f if line.strip()]
