@@ -10,8 +10,8 @@
 ![GitHub Issues Closed](https://img.shields.io/github/issues-closed/Katazui/DJAutomation.svg)
 ![GitHub Release](https://img.shields.io/github/release/Katazui/DJAutomation.svg)
 ![Repo Size](https://img.shields.io/github/repo-size/Katazui/DJAutomation.svg)
-![GitHub Forks](https://img.shields.io/github/forks/Katazui/DJAutomation.svg?style=social&label=Fork)
-![GitHub Stars](https://img.shields.io/github/stars/Katazui/DJAutomation.svg?style=social&label=Stars)
+![GitHub Forks](https://img.shields.io/github/forks/Katazui/DJAutomation?style=social&label=Fork)
+![GitHub Stars](https://img.shields.io/github/stars/Katazui/DJAutomation?style=social&label=Stars)
 
 ![DJ Automation Banner](https://katazui.com/wp-content/uploads/2023/07/Katazui-Logo-1-300x188.png)
 
