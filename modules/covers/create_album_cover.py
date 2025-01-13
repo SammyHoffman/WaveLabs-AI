@@ -280,6 +280,7 @@ def main():
     )
     if not image_files:
         print(f"{MSG_ERROR}No images found in {ORIGINAL_IMAGES_FOLDER}")
+        print(f"{MSG_NOTICE}Please use 'djcli dl_pexel' to download images.")
         return
 
     # 7) Process each image

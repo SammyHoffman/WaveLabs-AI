@@ -208,7 +208,7 @@ def ensure_album_cover_config():
         shutil.copyfile(DEFAULT_JSON_PATH, USER_CONFIG_PATH)
         print(f"{MSG_NOTICE}Created user album cover config at {USER_CONFIG_PATH}. Please edit to customize album covers.")
     else:
-        print(f"{MSG_STATUS}Using existing album cover config at {USER_CONFIG_PATH}.")
+        print(f"{MSG_STATUS}Loaded existing album cover config from: {USER_CONFIG_PATH}")
     return USER_CONFIG_PATH
 
 ALBUM_COVER_CONFIG = {}
@@ -249,8 +249,8 @@ def ensure_user_py_settings():
 
 def load_user_py_settings_as_dict():
     user_file = ensure_user_py_settings()
-    if user_file:
-        print(f"{MSG_STATUS}Found user settings from {user_file}")
+    # if user_file:
+    #     print(f"{MSG_STATUS}Found user settings from {user_file}")
     user_namespace = {}
     try:
         with open(user_file, "r", encoding="utf-8") as f:

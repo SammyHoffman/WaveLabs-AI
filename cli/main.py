@@ -30,7 +30,7 @@ from modules.organize.organize_files import organize_downloads
 from mixcloud_cli import handle_mixcloud_subcommand
 from core.color_utils import (
     COLOR_GREEN, COLOR_CYAN, COLOR_RESET,
-    MSG_STATUS, MSG_NOTICE, MSG_WARNING, MSG_ERROR, LINE_BREAK, MSG_SUCCESS
+    MSG_STATUS, MSG_NOTICE, MSG_WARNING, MSG_ERROR, LINE_BREAK, MSG_SUCCESS, MSG_DEBUG
 )
 from config.settings import (
     TAGS, DOWNLOAD_FOLDER_NAME,
@@ -39,20 +39,23 @@ from config.settings import (
     LASTFM_API_KEY, DEEZER_API_KEY,
     MUSICBRAINZ_API_TOKEN, PEXEL_API_KEY,
     DEBUG_MODE, LINKS_FILE, USER_CONFIG_FOLDER,
-    ensure_user_py_settings, load_user_py_settings_as_dict
+    ensure_user_py_settings, load_user_py_settings_as_dict,
+    LOCAL_TRACK_DIR, EXTERNAL_TRACK_DIR, USE_EXTERNAL_TRACK_DIR,
+    
 )
 
 def banner():
     return f"""{COLOR_CYAN}
-            _                  _ 
-  /\ /\__ _| |_ __ _ _____   _(_)
- / //_/ _` | __/ _` |_  / | | | |
-/ __ \ (_| | || (_| |/ /| |_| | |
-\/  \/\__,_|\__\__,_/___|\__,_|_|
-************************************************
-*  Welcome to the DJ Automation CLI!           *
-*  Control your entire DJ workflow in one place*
-************************************************
+                   _                  _ 
+         /\ /\__ _| |_ __ _ _____   _(_)
+        / //_/ _` | __/ _` |_  / | | | |
+       / __ \ (_| | || (_| |/ /| |_| | |
+       \/  \/\__,_|\__\__,_/___|\__,_|_|
+**************************************************
+*       Welcome to the DJ CLI by Katazui.com     *
+*  Control your entire DJ workflow in one place  *
+*            Version: 1.0.0-alpha                *      
+**************************************************
 {COLOR_RESET}"""
 
 def add_project_root_to_path():
@@ -68,15 +71,21 @@ def print_loaded_configurations():
     if DEBUG_MODE is True.
     """
     print(f"{MSG_STATUS}Loaded Settings:")
-    print(f"  DEBUG_MODE: {DEBUG_MODE}")
-    print(f"  MIXCLOUD_CLIENT_ID: {MIXCLOUD_CLIENT_ID}")
-    print(f"  SPOTIFY_CLIENT_ID: {SPOTIFY_CLIENT_ID}")
-    print(f"  LASTFM_API_KEY: {LASTFM_API_KEY}")
-    print(f"  DEEZER_API_KEY: {DEEZER_API_KEY}")
-    print(f"  MUSICBRAINZ_API_TOKEN: {MUSICBRAINZ_API_TOKEN}")
-    print(f"  PEXEL_API_KEY: {PEXEL_API_KEY}")
-    print(f"  DOWNLOAD_FOLDER_NAME: {DOWNLOAD_FOLDER_NAME}")
-    print(f"  LINKS_FILE: {LINKS_FILE}")
+    print(f"{MSG_DEBUG}DEBUG_MODE: {DEBUG_MODE}")
+    print(f"  {MSG_NOTICE}API Keys:")
+    print(f"    {MSG_DEBUG}MIXCLOUD_CLIENT_ID: {MIXCLOUD_CLIENT_ID}")
+    print(f"    {MSG_DEBUG}SPOTIFY_CLIENT_ID: {SPOTIFY_CLIENT_ID}")
+    print(f"    {MSG_DEBUG}LASTFM_API_KEY: {LASTFM_API_KEY}")
+    # print(f"    {MSG_DEBUG}DEEZER_API_KEY: {DEEZER_API_KEY}")
+    # print(f"    {MSG_DEBUG}MUSICBRAINZ_API_TOKEN: {MUSICBRAINZ_API_TOKEN}")
+    print(f"    {MSG_DEBUG}PEXEL_API_KEY: {PEXEL_API_KEY}")
+    print(f"  {MSG_NOTICE}Files & Paths:")
+    print(f"    {MSG_DEBUG}DOWNLOADS_FOLDER: {DOWNLOAD_FOLDER_NAME}")
+    print(f"    {MSG_DEBUG}LINKS_FILE: {LINKS_FILE}")
+    if USE_EXTERNAL_TRACK_DIR:
+        print(f"    {MSG_DEBUG}EXTERNAL_TRACK_DIR: {EXTERNAL_TRACK_DIR}")
+    else:
+        print(f"    {MSG_DEBUG}LOCAL_TRACK_DIR: {LOCAL_TRACK_DIR}")
     print(LINE_BREAK)
 
 
@@ -95,7 +104,6 @@ def handle_download_music_subcommand(args):
         organize_downloads(requested=False)
 
 def handle_download_pexel_subcommand(args):
-    print(f"{MSG_NOTICE}Starting 'download_pexel' subcommand...\n{LINE_BREAK}")
     one_folder_up = os.path.dirname(USER_CONFIG_FOLDER)
     folder_path = os.path.join(one_folder_up, 'content', 'albumCovers', 'pexel')
     log_path = os.path.join(one_folder_up, 'content', 'downloaded_pexel_photos.txt')
@@ -173,14 +181,17 @@ def handle_config_subcommand(args):
         except Exception as e:
             print(f"{MSG_ERROR}Failed to initialize user settings: {e}")
 
+    if args.print:
+        print_loaded_configurations()
+
     api_keys = [
         ("MIXCLOUD_CLIENT_ID",     MIXCLOUD_CLIENT_ID),
         ("MIXCLOUD_CLIENT_SECRET", MIXCLOUD_CLIENT_SECRET),
         ("SPOTIFY_CLIENT_ID",      SPOTIFY_CLIENT_ID),
         ("SPOTIFY_CLIENT_SECRET",  SPOTIFY_CLIENT_SECRET),
         ("LASTFM_API_KEY",         LASTFM_API_KEY),
-        ("DEEZER_API_KEY",         DEEZER_API_KEY),
-        ("MUSICBRAINZ_API_TOKEN",  MUSICBRAINZ_API_TOKEN),
+        # ("DEEZER_API_KEY",         DEEZER_API_KEY),
+        # ("MUSICBRAINZ_API_TOKEN",  MUSICBRAINZ_API_TOKEN),
         ("PEXEL_API_KEY",          PEXEL_API_KEY),
     ]
 
@@ -294,6 +305,7 @@ def setup_argparser():
 
     # Config
     config_parser = subparsers.add_parser("config", help="Check or set API keys in .env and manage user settings.")
+    config_parser.add_argument("--print", action="store_true", help="Print loaded configurations.")
     config_parser.add_argument("--mc_id",       type=str, help="Set Mixcloud Client ID.")
     config_parser.add_argument("--mc_secret",   type=str, help="Set Mixcloud Client Secret.")
     config_parser.add_argument("--spotify_id",  type=str, help="Set Spotify Client ID.")
@@ -304,6 +316,7 @@ def setup_argparser():
     config_parser.add_argument("--pexel",       type=str, help="Set Pexel API key.")
     config_parser.add_argument("--init-settings", action="store_true", help="Initialize (create) user_settings.py in the configuration folder.")
 
+
     return parser
 
 # ----------------------------------------------------------------
@@ -311,8 +324,10 @@ def setup_argparser():
 # ----------------------------------------------------------------
 
 def main():
+    # Clear terminal screen
+    # os.system("cls" if os.name == "nt" else "clear")
+
     add_project_root_to_path()
-    print(banner())
 
     # Load user settings so that if a user_settings.py exists in the user config folder,
     # its values override the defaults.
@@ -320,7 +335,7 @@ def main():
         from config.settings import ensure_user_py_settings, load_user_py_settings_as_dict, DEFAULT_PY_SETTINGS
         user_settings_path = ensure_user_py_settings()
         user_cfg = load_user_py_settings_as_dict()
-        print(f"{MSG_STATUS}Loaded user settings from: {user_settings_path}\n")
+        print(f"{MSG_STATUS}Loaded user settings from: {user_settings_path}")
         # Optionally override specific settings:
         global MIXCLOUD_CLIENT_ID, MIXCLOUD_CLIENT_SECRET, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET
         global LASTFM_API_KEY, DEEZER_API_KEY, MUSICBRAINZ_API_TOKEN, PEXEL_API_KEY
@@ -343,6 +358,7 @@ def main():
     except Exception as e:
         print(f"{MSG_ERROR}Error loading user settings: {e}")
 
+    print(banner())
 
     parser = setup_argparser()
     args = parser.parse_args()
