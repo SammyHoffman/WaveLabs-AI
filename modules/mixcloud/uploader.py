@@ -76,6 +76,49 @@ from core.color_utils import (
 ACCESS_TOKEN = None
 
 #########################################################
+#                 CREATE CONFIGURATION
+#########################################################
+
+# Boolean to check if configuration files & path exist
+def check_mixcloud_config():
+    return all(
+        os.path.exists(p) for p in [    
+            PUBLISHED_DATES, TITLES_FILE, UPLOAD_LINKS_FILE,
+            COVER_IMAGE_DIRECTORY, FINISHED_DIRECTORY
+        ]
+    )
+
+def create_mixcloud_files():
+    # If PUBLISHED_DATES, TITLES_FILE, UPLOAD_LINKS_FILE don't exist, create them.
+    if not os.path.exists(PUBLISHED_DATES):
+        with open(PUBLISHED_DATES, 'w') as f:
+            f.write("")
+        print(f"{MSG_NOTICE}Created {PUBLISHED_DATES}")
+
+    if not os.path.exists(TITLES_FILE):
+        with open(TITLES_FILE, 'w', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=["title", "description"])
+            writer.writeheader()
+        print(f"{MSG_NOTICE}Created {TITLES_FILE}")
+
+    if not os.path.exists(UPLOAD_LINKS_FILE):
+        with open(UPLOAD_LINKS_FILE, 'w') as f:
+            f.write("")
+        print(f"{MSG_NOTICE}Created {UPLOAD_LINKS_FILE}")
+
+    # Create cover image directory if it doesn't exist
+    if not os.path.exists(COVER_IMAGE_DIRECTORY):
+        os.makedirs(COVER_IMAGE_DIRECTORY)
+        print(f"{MSG_NOTICE}Created {COVER_IMAGE_DIRECTORY}")
+
+    # Create finished directory if it doesn't exist
+    if not os.path.exists(FINISHED_DIRECTORY):
+        os.makedirs(FINISHED_DIRECTORY)
+        print(f"{MSG_NOTICE}Created {FINISHED_DIRECTORY}")
+
+    print(f"{MSG_SUCCESS}Configuration files created.")
+
+#########################################################
 #                 GENERIC HELPERS
 #########################################################
 
@@ -443,6 +486,13 @@ def main():
     if not MIXCLOUD_ENABLED:
         print(f"{MSG_WARNING}Mixcloud is disabled in config. Exiting.")
         sys.exit(0)
+
+    # # Check for configuration files
+    # if not check_mixcloud_config():
+    #     print(f"{MSG_WARNING}Configuration files not found. Creating...")
+    #     create_mixcloud_files()
+    #     print(f"{MSG_WARNING}Please fill in the necessary details and run again.")
+    #     sys.exit(0)
 
     # Start OAuth in a thread
     t = threading.Thread(target=start_oauth_server)

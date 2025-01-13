@@ -44,15 +44,7 @@ def banner():
     """
     Returns a colorful ASCII banner to greet the user.
     """
-    return f"""{COLOR_CYAN}
-   __  ___          _                     __       
-  /  |/  /___ _____(_)___  ____  ___     / /___  __
- / /|_/ / __ `/ __ `/ __ \/ __ \/ _ \   / / __ \/ /
-/ /  / / /_/ / /_/ / / / / / / /  __/  / / /_/ / / 
-/_/  /_/\__,_/\__, /_/ /_/_/ /_/\___/  /_/\____/_/  
-             /____/                               
-{COLOR_RESET}
-"""
+    return f"""{COLOR_CYAN}Hi there! Welcome to the Mixcloud CLI.{COLOR_RESET}"""
 
 
 def check_directories():

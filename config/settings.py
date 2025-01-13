@@ -286,6 +286,41 @@ if not PEXEL_API_KEY and "PEXEL_API_KEY" in USER_PY_CFG:
     PEXEL_API_KEY = USER_PY_CFG["PEXEL_API_KEY"]
     print(f"{MSG_NOTICE}Overriding PEXEL_API_KEY from user_settings.py")
 
+# Override Customization Settings
+if "COVER_IMAGE_DIRECTORY" in USER_PY_CFG:
+    COVER_IMAGE_DIRECTORY = USER_PY_CFG["COVER_IMAGE_DIRECTORY"]
+    if DEBUG_MODE:
+        print(f"{MSG_NOTICE}Overriding COVER_IMAGE_DIRECTORY from user_settings.py")
+if "FINISHED_DIRECTORY" in USER_PY_CFG:
+    FINISHED_DIRECTORY = USER_PY_CFG["FINISHED_DIRECTORY"]
+    if DEBUG_MODE:
+        print(f"{MSG_NOTICE}Overriding FINISHED_DIRECTORY from user_settings.py")
+if "PUBLISHED_DATES" in USER_PY_CFG:
+    PUBLISHED_DATES = USER_PY_CFG["PUBLISHED_DATES"]
+    if DEBUG_MODE:
+        print(f"{MSG_NOTICE}Overriding PUBLISHED_DATES from user_settings.py")
+if "TITLES_FILE" in USER_PY_CFG:
+    TITLES_FILE = USER_PY_CFG["TITLES_FILE"]
+    if DEBUG_MODE:
+        print(f"{MSG_NOTICE}Overriding TITLES_FILE from user_settings.py")
+if "UPLOAD_LINKS_FILE" in USER_PY_CFG:
+    UPLOAD_LINKS_FILE = USER_PY_CFG["UPLOAD_LINKS_FILE"]
+    if DEBUG_MODE:
+        print(f"{MSG_NOTICE}Overriding UPLOAD_LINKS_FILE from user_settings.py")
+if LINKS_FILE and "LINKS_FILE" in USER_PY_CFG:
+    LINKS_FILE = USER_PY_CFG["LINKS_FILE"]
+    if DEBUG_MODE:
+        print(f"{MSG_NOTICE}Overriding LINKS_FILE from user_settings.py")
+if "EXTERNAL_TRACK_DIR" in USER_PY_CFG:
+    EXTERNAL_TRACK_DIR = USER_PY_CFG["EXTERNAL_TRACK_DIR"]
+    if DEBUG_MODE:
+        print(f"{MSG_NOTICE}Overriding EXTERNAL_TRACK_DIR from user_settings.py")
+if "LOCAL_TRACK_DIR" in USER_PY_CFG:
+    LOCAL_TRACK_DIR = USER_PY_CFG["LOCAL_TRACK_DIR"]
+    if DEBUG_MODE:
+        print(f"{MSG_NOTICE}Overriding LOCAL_TRACK_DIR from user_settings.py")
+
+
 # ----------------------------------------------------------------
 #   REMINDER: DO NOT STORE SECRETS IN THIS FILE; USE .env INSTEAD.
 # ----------------------------------------------------------------
