@@ -143,6 +143,8 @@ def create_mixcloud_files():
                 with open(file, 'w') as f:
                     f.write(content)
                 print(f"{MSG_NOTICE}Created {file}")
+            else:
+                print(f"{MSG_NOTICE}Already existed - {file}")
 
         # Titles file with CSV header
         if not os.path.exists(TITLES_FILE):
@@ -150,6 +152,8 @@ def create_mixcloud_files():
                 writer = csv.DictWriter(f, fieldnames=["title", "description"])
                 writer.writeheader()
             print(f"{MSG_NOTICE}Created {TITLES_FILE}")
+        else:
+            print(f"{MSG_NOTICE}Already existed - {TITLES_FILE}")
 
         # Directory creation
         directories_to_create = [
@@ -158,14 +162,16 @@ def create_mixcloud_files():
         ]
 
         for directory in directories_to_create:
-            os.makedirs(directory, exist_ok=True)
-            print(f"{MSG_NOTICE}Created {directory}")
+            if not os.path.exists(directory):
+                os.makedirs(directory, exist_ok=True)
+                print(f"{MSG_NOTICE}Created {directory}")
+            else:
+                print(f"{MSG_NOTICE}Already existed - {directory}")
 
-        print(f"{MSG_SUCCESS}Configuration files and directories created.")
+        print(f"{MSG_SUCCESS}Configuration files and directories checked and created as needed.")
 
     except Exception as e:
         print(f"{MSG_ERROR}An error occurred: {str(e)}")
-
 
 def main():
     """

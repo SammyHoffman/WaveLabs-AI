@@ -184,7 +184,7 @@ TAGS = [ # TODO: Refactor a Clearer Name
 
 USER_CONFIG_DJCLI = os.path.expanduser("~/Documents/DJCLI")
 PEXEL_DOWNLOAD_FOLDER = os.path.join(USER_CONFIG_DJCLI, "content", "download", "download_pexel")
-PEXEL_LOG_FILE = os.path.join(USER_CONFIG_DJCLI, "content", "downloaded_pexel_photos.txt")
+PEXEL_LOG_FILE = os.path.join(USER_CONFIG_DJCLI, "content", "albumCovers", "downloaded_pexel_photos.txt")
 
 # ----------------------------------------------------------------
 #   ALBUM COVER CONFIGURATION (JSON)

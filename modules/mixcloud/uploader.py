@@ -76,49 +76,6 @@ from core.color_utils import (
 ACCESS_TOKEN = None
 
 #########################################################
-#                 CREATE CONFIGURATION
-#########################################################
-
-# Boolean to check if configuration files & path exist
-def check_mixcloud_config():
-    return all(
-        os.path.exists(p) for p in [    
-            PUBLISHED_DATES, TITLES_FILE, UPLOAD_LINKS_FILE,
-            COVER_IMAGE_DIRECTORY, FINISHED_DIRECTORY
-        ]
-    )
-
-def create_mixcloud_files():
-    # If PUBLISHED_DATES, TITLES_FILE, UPLOAD_LINKS_FILE don't exist, create them.
-    if not os.path.exists(PUBLISHED_DATES):
-        with open(PUBLISHED_DATES, 'w') as f:
-            f.write("")
-        print(f"{MSG_NOTICE}Created {PUBLISHED_DATES}")
-
-    if not os.path.exists(TITLES_FILE):
-        with open(TITLES_FILE, 'w', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=["title", "description"])
-            writer.writeheader()
-        print(f"{MSG_NOTICE}Created {TITLES_FILE}")
-
-    if not os.path.exists(UPLOAD_LINKS_FILE):
-        with open(UPLOAD_LINKS_FILE, 'w') as f:
-            f.write("")
-        print(f"{MSG_NOTICE}Created {UPLOAD_LINKS_FILE}")
-
-    # Create cover image directory if it doesn't exist
-    if not os.path.exists(COVER_IMAGE_DIRECTORY):
-        os.makedirs(COVER_IMAGE_DIRECTORY)
-        print(f"{MSG_NOTICE}Created {COVER_IMAGE_DIRECTORY}")
-
-    # Create finished directory if it doesn't exist
-    if not os.path.exists(FINISHED_DIRECTORY):
-        os.makedirs(FINISHED_DIRECTORY)
-        print(f"{MSG_NOTICE}Created {FINISHED_DIRECTORY}")
-
-    print(f"{MSG_SUCCESS}Configuration files created.")
-
-#########################################################
 #                 GENERIC HELPERS
 #########################################################
 
@@ -164,15 +121,15 @@ def remove_first_line(file_path):
     except Exception as e:
         print(f"{MSG_ERROR}Error removing first line from {file_path}: {e}")
 
-
+# Track is not moved to finished directory
 def move_to_finished(track_path, cover_path, finished_dir):
     """
     Moves the track and cover image to the finished directory.
     """
     try:
-        shutil.move(track_path, os.path.join(finished_dir, os.path.basename(track_path)))
-        if cover_path and os.path.exists(cover_path):
-            shutil.move(cover_path, os.path.join(finished_dir, os.path.basename(cover_path)))
+        # shutil.move(track_path, os.path.join(finished_dir, os.path.basename(track_path)))
+        # if cover_path and os.path.exists(cover_path):
+        shutil.move(cover_path, os.path.join(finished_dir, os.path.basename(cover_path)))
     except Exception as e:
         print(f"{MSG_ERROR}Error moving files to finished directory: {e}")
 
@@ -437,7 +394,7 @@ def upload_track(
             print(f"{MSG_SUCCESS}Successfully uploaded: {track_name}")
 
             if not DEBUG and remove_files:
-                move_to_finished(file_path, cover_path, FINISHED_DIRECTORY)
+                move_to_finished(file_path, cover_path, FINISHED_DIRECTORY) # ! Track is not moved to finished directory by default
 
             remove_first_line(PUBLISHED_DATES)
             result_data = resp.json()
