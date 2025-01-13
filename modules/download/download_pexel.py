@@ -4,7 +4,7 @@ import os
 import requests
 import random
 import time
-from config.settings import PEXEL_API_KEY, PEXEL_API_URL, TAGS
+from config.settings import PEXEL_API_KEY, PEXEL_API_URL, TAGS, USER_CONFIG_FOLDER, PEXEL_LOG_FILE as LOG_FILE, PEXEL_DOWNLOAD_FOLDER as DOWNLOAD_FOLDER
 from core.color_utils import (
     COLOR_GREEN, COLOR_RED, COLOR_YELLOW, COLOR_RESET,
     MSG_NOTICE, MSG_ERROR, MSG_SUCCESS
@@ -15,9 +15,6 @@ headers = {
     'Authorization': PEXEL_API_KEY
 }
 
-# Paths
-LOG_FILE = os.path.join('content', 'downloaded_pexel_photos.txt')  # Updated path
-DOWNLOAD_FOLDER = os.path.join('content', 'albumCovers', 'pexel')
 
 def download_photo(url, folder, photo_id):
     """
@@ -36,7 +33,7 @@ def download_photo(url, folder, photo_id):
                 for chunk in response.iter_content(1024):
                     if chunk:
                         f.write(chunk)
-            print(f"Downloaded photo {photo_id}")
+            print(f"{MSG_SUCCESS}Downloaded photo {photo_id}")
         else:
             print(f"Failed to download photo {photo_id} | Status Code: {response.status_code}")
     except Exception as e:
@@ -76,7 +73,7 @@ def write_downloaded_photo_ids(file_path, photo_ids):
             for photo_id in photo_ids:
                 f.write(f"{photo_id}\n")
     except Exception as e:
-        print(f"Exception occurred while writing to log file {file_path}: {e}")
+        print(f"{MSG_ERROR}Exception occurred while writing to log file {file_path}: {e}")
 
 def search_and_download_photos(tags, total_photos=5, folder=DOWNLOAD_FOLDER, log_file=LOG_FILE):
     """
@@ -89,7 +86,7 @@ def search_and_download_photos(tags, total_photos=5, folder=DOWNLOAD_FOLDER, log
     - log_file (str): Path to the log file for tracking downloaded photo IDs.
     """
     if not PEXEL_API_KEY:
-        print("[Error]: PEXEL_API_KEY is not set. Please add it to your .env file.")
+        print(f"{MSG_ERROR}:PEXEL_API_KEY is not set. Please add it to your .env file.")
         return
 
     # Read already downloaded photo IDs to avoid duplicates
@@ -114,7 +111,7 @@ def search_and_download_photos(tags, total_photos=5, folder=DOWNLOAD_FOLDER, log
         try:
             response = requests.get(PEXEL_API_URL, headers=headers, params=params)
         except requests.exceptions.RequestException as e:
-            print(f"[Error]: Request exception for tag '{tag}': {e}")
+            print(f"{MSG_ERROR}Request exception for tag '{tag}': {e}")
             # Optionally, remove the tag to avoid repeated failures
             available_tags.remove(tag)
             continue
@@ -124,7 +121,7 @@ def search_and_download_photos(tags, total_photos=5, folder=DOWNLOAD_FOLDER, log
             photos = data.get('photos', [])
             
             if not photos:
-                print(f"No photos found for tag: {tag}")
+                print(f"{MSG_ERROR}No photos found for tag: {tag}")
                 # Optionally, remove the tag if no photos are found
                 available_tags.remove(tag)
                 continue
@@ -139,7 +136,7 @@ def search_and_download_photos(tags, total_photos=5, folder=DOWNLOAD_FOLDER, log
                     if photos_downloaded >= total_photos:
                         break
                 else:
-                    print(f"Skipping already downloaded photo {photo_id}")
+                    print(f"{MSG_NOTICE}Skipping already downloaded photo {photo_id}")
 
             # To avoid hitting rate limits
             time.sleep(1)  # Sleep for 1 second between requests
@@ -152,9 +149,10 @@ def search_and_download_photos(tags, total_photos=5, folder=DOWNLOAD_FOLDER, log
             # Optionally, remove the tag to avoid repeated failures
             available_tags.remove(tag)
 
-    # Write the newly downloaded photo IDs to the log file
+    # Write the newly downloaded photo IDs to the log file and path of download photo
     write_downloaded_photo_ids(log_file, new_downloaded_photo_ids)
-    print(f"{len(new_downloaded_photo_ids)} new photos downloaded and logged.")
+    path_of_downloaded_photo = os.path.join(folder, f"{new_downloaded_photo_ids}.jpg")
+    print(f"{MSG_SUCCESS}{len(new_downloaded_photo_ids)} new photos downloaded and logged: {path_of_downloaded_photo}")
 
 if __name__ == "__main__":
     # This allows you to run the script directly for testing purposes

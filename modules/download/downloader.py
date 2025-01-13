@@ -75,7 +75,7 @@ def download_track(link, output_dir, quality="320"):
                 downloaded_file_path = info_dict['requested_downloads'][0].get('filepath')
 
             if not downloaded_file_path or not os.path.exists(downloaded_file_path):
-                print(f"{MSG_ERROR}File not found after download. Possibly a postprocessing error.")
+                print(f"{MSG_ERROR}File not found after download. Possibly a postprocessing error. Expected path: {downloaded_file_path}")
                 return None, info_dict
 
             print(f"{MSG_SUCCESS}Downloaded file: {downloaded_file_path}")

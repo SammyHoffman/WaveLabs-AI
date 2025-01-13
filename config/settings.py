@@ -8,6 +8,7 @@ Sensitive credentials (Mixcloud, Spotify, Last.fm, etc.) should be in .env only.
 import os
 import json
 import sys
+import shutil
 from dotenv import load_dotenv
 
 # ----------------------------------------------------------------
@@ -50,7 +51,7 @@ LINKS_FILE = os.environ.get(
 # ----------------------------------------------------------------
 
 USE_COLOR_LOGS = os.getenv("USE_COLOR_LOGS", "True").strip().lower() == "true"
-DEBUG_MODE = os.getenv("DEBUG_MODE", "False").strip().lower() == "true"
+DEBUG_MODE = os.getenv("DEBUG_MODE", "True").strip().lower() == "true"
 
 # ----------------------------------------------------------------
 #   MIXCLOUD + OTHER SENSITIVE CREDENTIALS (FROM .ENV)
@@ -162,40 +163,110 @@ TAGS = [ # TODO: Refactor a Clearer Name
     'gradient', 'blurred background', 'soft colors', 'pastel colors', 'bokeh', 'aesthetic', 'empty space'
 ]
 
+USER_CONFIG_DJCLI = os.path.expanduser("~/Documents/DJCLI")
+PEXEL_DOWNLOAD_FOLDER = os.path.join(USER_CONFIG_DJCLI, "content", "download", "download_pexel")
+PEXEL_LOG_FILE = os.path.join(USER_CONFIG_DJCLI, "content", "downloaded_pexel_photos.txt")
+
 # ----------------------------------------------------------------
-#   ALBUM COVER CONFIGURATION
+#   ALBUM COVER CONFIGURATION (JSON)
 # ----------------------------------------------------------------
 
-# 1) Path to your album cover config JSON
-ALBUM_COVER_JSON_PATH = os.path.join(
-    os.path.dirname(__file__),  # the 'config' folder
-    "albumCoverConfig.json"
+DEFAULT_JSON_PATH = os.path.join(
+    os.path.dirname(__file__),
+    "default_albumCoverConfig.json"
 )
 
-# 2) Load the JSON file
-if not os.path.exists(ALBUM_COVER_JSON_PATH):
-    raise FileNotFoundError(f"Could not find albumCoverConfig.json at {ALBUM_COVER_JSON_PATH}")
+USER_DOCS = os.path.expanduser("~/Documents")
+USER_CONFIG_FOLDER = os.path.join(USER_DOCS, "DJCLI", "configuration")
+USER_CONFIG_PATH = os.path.join(USER_CONFIG_FOLDER, "albumCoverConfig.json")
 
-with open(ALBUM_COVER_JSON_PATH, "r", encoding="utf-8") as f:
-    ALBUM_COVER_CONFIG = json.load(f)
+def ensure_album_cover_config():
+    if not os.path.exists(USER_CONFIG_FOLDER):
+        os.makedirs(USER_CONFIG_FOLDER, exist_ok=True)
+    if not os.path.exists(USER_CONFIG_PATH):
+        if not os.path.exists(DEFAULT_JSON_PATH):
+            raise FileNotFoundError(f"Default album cover config not found at {DEFAULT_JSON_PATH}")
+        shutil.copyfile(DEFAULT_JSON_PATH, USER_CONFIG_PATH)
+        print(f"[Notice]: Created user album cover config at {USER_CONFIG_PATH}. Please edit to customize album covers.")
+    else:
+        print(f"[Status]: Using existing album cover config at {USER_CONFIG_PATH}.")
+    return USER_CONFIG_PATH
 
-# 3) Expose the data in variables
-GLOBAL_SETTINGS = ALBUM_COVER_CONFIG["GLOBAL_SETTINGS"]
-CONFIGURATIONS  = ALBUM_COVER_CONFIG["CONFIGURATIONS"]
+ALBUM_COVER_CONFIG = {}
+try:
+    user_json_path = ensure_album_cover_config()
+    with open(user_json_path, "r", encoding="utf-8") as f:
+        ALBUM_COVER_CONFIG = json.load(f)
+except Exception as e:
+    print(f"[Error]: Could not load albumCoverConfig.json: {e}")
+    ALBUM_COVER_CONFIG = {}
 
-# For convenience, you can break out specific fields:
+GLOBAL_SETTINGS = ALBUM_COVER_CONFIG.get("GLOBAL_SETTINGS", {})
+CONFIGURATIONS = ALBUM_COVER_CONFIG.get("CONFIGURATIONS", {})
+
 PASTE_LOGO = GLOBAL_SETTINGS.get("PASTE_LOGO", True)
 ORIGINAL_IMAGES_FOLDER = GLOBAL_SETTINGS.get("ORIGINAL_IMAGES_FOLDER", "")
-DESTINATION_FOLDER     = GLOBAL_SETTINGS.get("DESTINATION_FOLDER", "")
-OUTPUT_FOLDER          = GLOBAL_SETTINGS.get("OUTPUT_FOLDER", "")
+DESTINATION_FOLDER = GLOBAL_SETTINGS.get("DESTINATION_FOLDER", "")
+OUTPUT_FOLDER = GLOBAL_SETTINGS.get("OUTPUT_FOLDER", "")
 
 # ----------------------------------------------------------------
-#   REMINDER FOR STORING CREDENTIALS
+#   PYTHON-BASED SETTINGS CONFIGURATION (for user overrides)
+# ----------------------------------------------------------------
+
+# Set the default Python settings file (packaged with your code)
+DEFAULT_PY_SETTINGS = os.path.join(CONFIG_DIR, "default_settings.py")
+# Set the destination user settings file (user-writable folder)
+USER_PY_SETTINGS = os.path.join(USER_CONFIG_FOLDER, "user_settings.py")
+
+def ensure_user_py_settings():
+    if not os.path.exists(USER_CONFIG_FOLDER):
+        os.makedirs(USER_CONFIG_FOLDER, exist_ok=True)
+    if not os.path.exists(USER_PY_SETTINGS):
+        if not os.path.exists(DEFAULT_PY_SETTINGS):
+            raise FileNotFoundError(f"Default Python settings not found at {DEFAULT_PY_SETTINGS}")
+        shutil.copyfile(DEFAULT_PY_SETTINGS, USER_PY_SETTINGS)
+        print(f"[Notice]: Copied default_settings.py to {USER_PY_SETTINGS}.")
+    else:
+        print(f"[Status]: Using existing user_settings at {USER_PY_SETTINGS}.")
+    return USER_PY_SETTINGS
+
+def load_user_py_settings_as_dict():
+    user_file = ensure_user_py_settings()
+    user_namespace = {}
+    try:
+        with open(user_file, "r", encoding="utf-8") as f:
+            code = f.read()
+        exec(code, user_namespace, user_namespace)
+    except Exception as e:
+        print(f"[Error]: Could not execute user_settings.py: {e}")
+    return user_namespace
+
+USER_PY_CFG = load_user_py_settings_as_dict()
+# Override environment-derived variables only if not already set via .env
+if not MIXCLOUD_CLIENT_ID and "MIXCLOUD_CLIENT_ID" in USER_PY_CFG:
+    MIXCLOUD_CLIENT_ID = USER_PY_CFG["MIXCLOUD_CLIENT_ID"]
+if not MIXCLOUD_CLIENT_SECRET and "MIXCLOUD_CLIENT_SECRET" in USER_PY_CFG:
+    MIXCLOUD_CLIENT_SECRET = USER_PY_CFG["MIXCLOUD_CLIENT_SECRET"]
+if not SPOTIFY_CLIENT_ID and "SPOTIFY_CLIENT_ID" in USER_PY_CFG:
+    SPOTIFY_CLIENT_ID = USER_PY_CFG["SPOTIFY_CLIENT_ID"]
+if not SPOTIFY_CLIENT_SECRET and "SPOTIFY_CLIENT_SECRET" in USER_PY_CFG:
+    SPOTIFY_CLIENT_SECRET = USER_PY_CFG["SPOTIFY_CLIENT_SECRET"]
+if not LASTFM_API_KEY and "LASTFM_API_KEY" in USER_PY_CFG:
+    LASTFM_API_KEY = USER_PY_CFG["LASTFM_API_KEY"]
+if not DEEZER_API_KEY and "DEEZER_API_KEY" in USER_PY_CFG:
+    DEEZER_API_KEY = USER_PY_CFG["DEEZER_API_KEY"]
+if not MUSICBRAINZ_API_TOKEN and "MUSICBRAINZ_API_TOKEN" in USER_PY_CFG:
+    MUSICBRAINZ_API_TOKEN = USER_PY_CFG["MUSICBRAINZ_API_TOKEN"]
+if not PEXEL_API_KEY and "PEXEL_API_KEY" in USER_PY_CFG:
+    PEXEL_API_KEY = USER_PY_CFG["PEXEL_API_KEY"]
+
+# ----------------------------------------------------------------
+#   REMINDER: DO NOT STORE SECRETS IN THIS FILE; USE .env INSTEAD.
 # ----------------------------------------------------------------
 """
 All sensitive credentials (Mixcloud, Spotify, Last.fm, etc.) 
 are read from .env to avoid committing secrets to source control.
-Make sure your .env is in .gitignore and never pushed publicly.
+Make sure your .env is in .gitignore and not pushed publicly.
 
 Sample .env fields:
 
@@ -206,4 +277,5 @@ SPOTIFY_CLIENT_SECRET=""
 LASTFM_API_KEY=""
 DEEZER_API_KEY=""
 MUSICBRAINZ_API_TOKEN=""
+PEXEL_API_KEY=""
 """
