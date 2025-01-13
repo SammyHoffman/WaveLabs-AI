@@ -95,7 +95,7 @@ def handle_download_music_subcommand(args):
         organize_downloads(requested=False)
 
 def handle_download_pexel_subcommand(args):
-    print(f"{MSG_NOTICE}Starting 'download_pexel' subcommand...{LINE_BREAK}")
+    print(f"{MSG_NOTICE}Starting 'download_pexel' subcommand...\n{LINE_BREAK}")
     one_folder_up = os.path.dirname(USER_CONFIG_FOLDER)
     folder_path = os.path.join(one_folder_up, 'content', 'albumCovers', 'pexel')
     log_path = os.path.join(one_folder_up, 'content', 'downloaded_pexel_photos.txt')
@@ -347,23 +347,23 @@ def main():
         return
 
     if args.command == "download_music":
-        print(f"{MSG_STATUS}Starting 'download_music' subcommand...{LINE_BREAK}")
+        print(f"{MSG_STATUS}Starting 'download_music' subcommand...\n{LINE_BREAK}")
         handle_download_music_subcommand(args)
 
     elif args.command == "download_pexel":
-        print(f"{MSG_STATUS}Starting 'download_pexel' subcommand...{LINE_BREAK}")
+        print(f"{MSG_STATUS}Starting 'download_pexel' subcommand...\n{LINE_BREAK}")
         handle_download_pexel_subcommand(args)
 
     elif args.command == "covers":
-        print(f"{MSG_STATUS}Starting 'covers' subcommand...{LINE_BREAK}")
+        print(f"{MSG_STATUS}Starting 'covers' subcommand...\n{LINE_BREAK}")
         handle_create_album_covers_subcommand(args)
 
     elif args.command == "organize":
-        print(f"{MSG_STATUS}Starting 'organize' subcommand...{LINE_BREAK}")
+        print(f"{MSG_STATUS}Starting 'organize' subcommand...\n{LINE_BREAK}")
         handle_organize_subcommand(args)
 
     elif args.command == "upload":
-        print(f"{MSG_STATUS}Starting 'upload' subcommand...{LINE_BREAK}")
+        print(f"{MSG_STATUS}Starting 'upload' subcommand...\n{LINE_BREAK}")
         handle_mixcloud_subcommand(args)
 
     elif args.command == "test":
@@ -372,7 +372,7 @@ def main():
         handle_test_subcommand(args)
 
     elif args.command == "config":
-        print(f"{MSG_STATUS}Starting 'config' subcommand...{LINE_BREAK}")
+        print(f"{MSG_STATUS}Starting 'config' subcommand...\n{LINE_BREAK}")
         handle_config_subcommand(args)
 
     else:

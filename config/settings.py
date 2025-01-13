@@ -51,7 +51,7 @@ LINKS_FILE = os.environ.get(
 # ----------------------------------------------------------------
 
 USE_COLOR_LOGS = os.getenv("USE_COLOR_LOGS", "True").strip().lower() == "true"
-DEBUG_MODE = os.getenv("DEBUG_MODE", "True").strip().lower() == "true"
+DEBUG_MODE = os.getenv("DEBUG_MODE", "False").strip().lower() == "true"
 
 # ----------------------------------------------------------------
 #   MIXCLOUD + OTHER SENSITIVE CREDENTIALS (FROM .ENV)
