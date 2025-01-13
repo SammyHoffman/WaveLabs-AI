@@ -319,6 +319,10 @@ if "LOCAL_TRACK_DIR" in USER_PY_CFG:
     LOCAL_TRACK_DIR = USER_PY_CFG["LOCAL_TRACK_DIR"]
     if DEBUG_MODE:
         print(f"{MSG_NOTICE}Overriding LOCAL_TRACK_DIR from user_settings.py")
+if "USE_EXTERNAL_TRACK_DIR" in USER_PY_CFG:
+    USE_EXTERNAL_TRACK_DIR = USER_PY_CFG["USE_EXTERNAL_TRACK_DIR"]
+    if DEBUG_MODE:
+        print(f"{MSG_NOTICE}Overriding USE_EXTERNAL_TRACK_DIR from user_settings.py")
 
 
 # ----------------------------------------------------------------

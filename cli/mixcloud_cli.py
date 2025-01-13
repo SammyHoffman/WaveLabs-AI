@@ -24,7 +24,7 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 
 # Import your core logic and color utilities
-from modules.mixcloud.uploader import main as run_mixcloud_upload
+from modules.mixcloud.uploader import main as run_mixcloud_upload, dry_run_upload
 # Or if you want to call a specialized function, e.g.:
 # from modules.mixcloud.uploader import run_mixcloud_upload
 
@@ -102,6 +102,11 @@ def handle_mixcloud_subcommand(args):
     if not ok:
         print(f"{MSG_ERROR}Cannot proceed with Mixcloud upload.")
         sys.exit(1)
+
+    if args.dry_run:
+        print(f"{MSG_NOTICE}Dry run mode enabled. No files will be uploaded.")
+        dry_run_upload()
+        return
 
     print(f"{MSG_STATUS}Starting Mixcloud upload flow...\n")
     # Here we call run_mixcloud_upload from the modules/mixcloud/uploader.

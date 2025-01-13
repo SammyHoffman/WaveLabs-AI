@@ -529,6 +529,7 @@ def main():
         print(f"{MSG_WARNING}No new tracks found.")
         sys.exit(0)
 
+    # Ask the user how many tracks to upload
     print(f"{MSG_STATUS}{len(t_files)} tracks found.")
     default_up = min(MAX_UPLOADS, len(t_files))
     try:
@@ -543,22 +544,26 @@ def main():
         print(f"{MSG_WARNING}Invalid input. Using default => {default_up}")
         num_up = default_up
 
+    # Limit to the number of uploads
     t_files = t_files[:num_up]
 
     # Show info
     display_upload_info(t_files, cover_imgs, published_dates, start_mix, selected_title)
 
+    # Confirm upload
     confirm = input(f"{MSG_WARNING}Confirm upload of {num_up} tracks? (y/n): ").lower()
     if confirm != "y":
         print(f"{MSG_NOTICE}Upload cancelled. Exiting.")
         return
 
+    # For each track, upload
     total = len(t_files)
     i = 0
     while i < total:
         track_fp = t_files[i]
-        mix_num = start_mix + i
 
+        # Find the corresponding cover image based on the expected mix number
+        mix_num = start_mix + i
         cpath = None
         for cimg in cover_imgs:
             cnum = extract_number(os.path.basename(cimg))
@@ -566,7 +571,10 @@ def main():
                 cpath = cimg
                 break
 
+        # Find the corresponding published date
         pub_date = published_dates[i] if i < len(published_dates) else None
+
+        # Upload the track
         print(f"{MSG_STATUS}Uploading Track {i+1}/{total} => {track_fp}")
         result = upload_track(
             track_fp, cpath, mix_num, 
@@ -575,14 +583,105 @@ def main():
         )
 
         if result is True:
+            # Successful upload, move to next track
             i += 1
         elif isinstance(result, dict) and "retry_after" in result:
+            # Rate limit reached, wait and retry
             secs = result["retry_after"]
             print(f"{MSG_NOTICE}Rate limit => Wait {secs//60} minutes.")
             for remain in range(int(secs), 0, -60):
                 time.sleep(60)
             print(f"{MSG_STATUS}Retrying upload.")
         else:
+            # Error occurred, skip to next track
             i += 1
 
     print(f"{MSG_SUCCESS}All uploads completed.")
+
+#########################################################
+#           DRY RUN
+#########################################################
+
+def dry_run_upload():
+    """
+    Simulates a single upload to Mixcloud without actual uploading.
+    This function will be triggered by the CLI.
+    """
+    global ACCESS_TOKEN
+
+    print(f"{MSG_STATUS}Starting Mixcloud Dry-Run...")
+
+    # Ensure Mixcloud is enabled
+    if not MIXCLOUD_ENABLED:
+        print(f"{MSG_WARNING}Mixcloud is disabled in config. Exiting dry-run.")
+        return
+
+    # Load titles from file
+    titles_data = load_titles_descriptions(TITLES_FILE)
+    if not titles_data:
+        print(f"{MSG_ERROR}No titles found in {TITLES_FILE}. Dry-run aborted.")
+        return
+
+    # Select the first title and description
+    selected_title = titles_data[0]["title"]
+    selected_description = titles_data[0]["description"]
+    print(f"{MSG_STATUS}Using Title: {selected_title}")
+    print(f"{MSG_STATUS}Description: {selected_description}")
+
+    # Load published dates from file
+    published_dates = parse_published_dates_from_file(PUBLISHED_DATES)
+    if not published_dates:
+        print(f"{MSG_ERROR}No published dates found in {PUBLISHED_DATES}. Dry-run aborted.")
+        return
+
+    # Check for tracks in the configured directories
+    if USE_EXTERNAL_TRACK_DIR:
+        t_files = traverse_external_directory(None, 1)
+    else:
+        all_files = glob.glob(os.path.join(LOCAL_TRACK_DIR, "*.mp3")) + glob.glob(
+            os.path.join(LOCAL_TRACK_DIR, "*.m4a")
+        )
+        t_files = sort_tracks_by_date(all_files)
+
+    if not t_files:
+        print(f"{MSG_WARNING}No tracks found for dry-run.")
+        return
+
+    # Select the first track
+    track_fp = t_files[0]
+    print(f"{MSG_STATUS}Track Selected: {track_fp}")
+
+    # Check for cover images
+    cover_imgs = sort_cover_images_by_mix_number(
+        glob.glob(os.path.join(COVER_IMAGE_DIRECTORY, "*.png")) +
+        glob.glob(os.path.join(COVER_IMAGE_DIRECTORY, "*.jpg"))
+    )
+
+    # Determine the mix number and find matching cover image
+    mix_number = get_last_uploaded_mix_number(UPLOAD_LINKS_FILE) + 1
+    cpath = None
+    for cimg in cover_imgs:
+        if extract_number(os.path.basename(cimg)) == mix_number:
+            cpath = cimg
+            break
+
+    if cpath:
+        print(f"{MSG_STATUS}Cover Image Selected: {cpath}")
+    else:
+        print(f"{MSG_WARNING}No matching cover image found for mix number {mix_number}.")
+
+    # Simulate upload metadata
+    dt = extract_date_from_filename(os.path.basename(track_fp))
+    date_str = dt.strftime("%Y-%m-%d") if dt else "No Date"
+    track_name = f"{selected_title} #{mix_number} | {date_str}"
+
+    # Display simulated upload information
+    display_upload_info(
+        track_files=[track_fp],
+        cover_images=[cpath] if cpath else [],
+        published_dates=published_dates[:1],
+        start_mix=mix_number,
+        title=selected_title
+    )
+
+    print(f"{MSG_SUCCESS}Dry-Run Complete. No uploads performed.")

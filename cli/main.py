@@ -307,6 +307,7 @@ def setup_argparser():
     # Mixcloud Upload
     mixcloud_parser = subparsers.add_parser("up_mixes", help="Upload multiple tracks to Mixcloud.")
     mixcloud_parser.add_argument("--init-settings", action="store_true", help="Initialize MixCloud Content.")
+    mixcloud_parser.add_argument("--dry-run", action="store_true", help="Dry run mode for Mixcloud uploads.")
 
     # Testing
     test_parser = subparsers.add_parser("test", help="Run tests.")
