@@ -324,7 +324,6 @@ if "USE_EXTERNAL_TRACK_DIR" in USER_PY_CFG:
     if DEBUG_MODE:
         print(f"{MSG_NOTICE}Overriding USE_EXTERNAL_TRACK_DIR from user_settings.py")
 
-
 # ----------------------------------------------------------------
 #   REMINDER: DO NOT STORE SECRETS IN THIS FILE; USE .env INSTEAD.
 # ----------------------------------------------------------------
