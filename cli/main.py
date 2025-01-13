@@ -23,6 +23,7 @@ from modules.download.downloader import (
     process_links_from_file,
     process_links_interactively
 )
+from modules.covers.create_album_cover import main as create_album_covers_main
 from modules.download.download_pexel import search_and_download_photos
 from modules.organize.organize_files import organize_downloads
 from mixcloud_cli import handle_mixcloud_subcommand
@@ -99,6 +100,10 @@ def handle_organize_subcommand(args):
     else:
         print(f"{MSG_NOTICE}Organizing all downloaded files...")
         organize_downloads()
+
+def handle_create_album_covers_subcommand(args):
+    create_album_covers_main()
+
 
 # ----------------------------------------------------------------
 #                   CONFIG SUBCOMMAND
@@ -272,11 +277,16 @@ def setup_argparser():
         help="Number of photos to download per tag. Default is 5."
     )
 
+    # Create Album Covers
+    covers_parser = subparsers.add_parser("covers", help="Generate album covers from images.")
+    # If you want any optional flags, add them here:
+    # covers_parser.add_argument("--preview", action="store_true", help="Display a preview?")
+
     # Organize
     organize_parser = subparsers.add_parser("organize", help="Organize downloaded files.")
     organize_parser.add_argument("--requested",
         action="store_true",
-        help="Organize only requested songs."
+        help="Organize to requested songs folder."
     )
 
     # Mixcloud Upload
@@ -322,6 +332,10 @@ def main():
     elif args.command == "download_pexel":
         print(f"{MSG_STATUS}Starting 'download_pexel' subcommand...{LINE_BREAK}")
         handle_download_pexel_subcommand(args)
+
+    elif args.command == "covers":
+        print(f"{MSG_STATUS}Starting 'covers' subcommand...{LINE_BREAK}")
+        handle_create_album_covers_subcommand(args)
 
     elif args.command == "organize":
         print(f"{MSG_STATUS}Starting 'organize' subcommand...{LINE_BREAK}")

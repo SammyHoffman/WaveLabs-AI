@@ -6,6 +6,7 @@ Sensitive credentials (Mixcloud, Spotify, Last.fm, etc.) should be in .env only.
 """
 
 import os
+import json
 import sys
 from dotenv import load_dotenv
 
@@ -160,6 +161,33 @@ TAGS = [ # TODO: Refactor a Clearer Name
     'texture', 'pattern', 'fabric', 'wood', 'marble', 'brick', 'concrete', 'metal',
     'gradient', 'blurred background', 'soft colors', 'pastel colors', 'bokeh', 'aesthetic', 'empty space'
 ]
+
+# ----------------------------------------------------------------
+#   ALBUM COVER CONFIGURATION
+# ----------------------------------------------------------------
+
+# 1) Path to your album cover config JSON
+ALBUM_COVER_JSON_PATH = os.path.join(
+    os.path.dirname(__file__),  # the 'config' folder
+    "albumCoverConfig.json"
+)
+
+# 2) Load the JSON file
+if not os.path.exists(ALBUM_COVER_JSON_PATH):
+    raise FileNotFoundError(f"Could not find albumCoverConfig.json at {ALBUM_COVER_JSON_PATH}")
+
+with open(ALBUM_COVER_JSON_PATH, "r", encoding="utf-8") as f:
+    ALBUM_COVER_CONFIG = json.load(f)
+
+# 3) Expose the data in variables
+GLOBAL_SETTINGS = ALBUM_COVER_CONFIG["GLOBAL_SETTINGS"]
+CONFIGURATIONS  = ALBUM_COVER_CONFIG["CONFIGURATIONS"]
+
+# For convenience, you can break out specific fields:
+PASTE_LOGO = GLOBAL_SETTINGS.get("PASTE_LOGO", True)
+ORIGINAL_IMAGES_FOLDER = GLOBAL_SETTINGS.get("ORIGINAL_IMAGES_FOLDER", "")
+DESTINATION_FOLDER     = GLOBAL_SETTINGS.get("DESTINATION_FOLDER", "")
+OUTPUT_FOLDER          = GLOBAL_SETTINGS.get("OUTPUT_FOLDER", "")
 
 # ----------------------------------------------------------------
 #   REMINDER FOR STORING CREDENTIALS

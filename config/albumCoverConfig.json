@@ -1,0 +1,79 @@
+{
+  "GLOBAL_SETTINGS": {
+    "PASTE_LOGO": true,
+    "ORIGINAL_IMAGES_FOLDER": "/Users/haleakala/Documents/PythonAutomation/autoAlbumCovers/input_images",
+    "DESTINATION_FOLDER": "/Users/haleakala/Documents/PythonAutomation/autoAlbumCovers/og_images",
+    "OUTPUT_FOLDER": "/Users/haleakala/Documents/PythonAutomation/autoAlbumCovers/output_images"
+  },
+  "CONFIGURATIONS": {
+    "Cue Club Archive": {
+      "active_flag": "CUE_CLUB_ARCHIVE",
+      "subheading_text_1": "Cue Club\n  Archive",
+      "subheading_text_2": "Katazui",
+      "main_text_template": "{mix_number}",
+      "font_path": "/Users/haleakala/Documents/PythonAutomation/autoAlbumCovers/chopsic-font/Chopsic-K6Dp.ttf",
+      "logo_path": "./content/albumCovers/logo.png",
+      "output_filename_template": "CueClubArchive_{mix_number}.jpg",
+
+      "font_scaling_main": 0.2,
+      "font_scaling_subheading": 0.06,
+      "font_scaling_multiplier": 2.3,
+
+      "mix_number_overrides": [
+        { "threshold": 99, "font_scaling_main": 0.15 },
+        { "threshold": 999, "font_scaling_main": 0.12 },
+        { "threshold": 9999, "font_scaling_main": 0.1 }
+      ],
+
+      "positions": {
+        "logo_size_factor": 0.1
+      }
+    },
+    "Late Night Breakfast": {
+      "active_flag": "LATE_NIGHT_BREAKFAST",
+      "subheading_text_1": "         LNB\n Archive {mix_number}",
+      "subheading_text_2": "Katazui",
+      "main_text_template": "JMU",
+      "font_path": "/Users/haleakala/Documents/PythonAutomation/autoAlbumCovers/chopsic-font/Chopsic-K6Dp.ttf",
+      "logo_path": "./content/albumCovers/logo.png",
+      "output_filename_template": "LNBArchive_{mix_number}.jpg",
+
+      "font_scaling_main": 0.15,
+      "font_scaling_subheading": 0.06,
+      "font_scaling_multiplier": 2.3,
+
+      "mix_number_overrides": [
+        { "threshold": 99, "font_scaling_main": 0.12 },
+        { "threshold": 999, "font_scaling_main": 0.1 },
+        { "threshold": 9999, "font_scaling_main": 0.08 }
+      ],
+
+      "positions": {
+        "logo_size_factor": 0.1
+      }
+    },
+    "Kickswap": {
+      "active_flag": "KICKSWAP",
+      "subheading_text_1": "         DMV\nKickswap",
+      "subheading_text_2": "Katazui",
+      "main_text_template": "{mix_number}",
+      "font_path": "/Users/haleakala/Documents/PythonAutomation/autoAlbumCovers/chopsic-font/Chopsic-K6Dp.ttf",
+      "logo_path": "./content/albumCovers/logo.png",
+      "output_filename_template": "KickswapArchive_{mix_number}.jpg",
+
+      "font_scaling_main": 0.2,
+      "font_scaling_subheading": 0.06,
+      "font_scaling_multiplier": 2.3,
+
+      "mix_number_overrides": [
+        { "threshold": 99, "font_scaling_main": 0.15 },
+        { "threshold": 999, "font_scaling_main": 0.12 },
+        { "threshold": 9999, "font_scaling_main": 0.1 }
+      ],
+
+      "positions": {
+        "logo_size_factor": 0.1
+      }
+    }
+  }
+}
