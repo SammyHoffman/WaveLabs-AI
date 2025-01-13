@@ -5,7 +5,7 @@ Handles logic for downloading audio from YouTube or SoundCloud using yt_dlp,
 then updates:
 - ID3 tags (artist, title, year, genre)
 - Album artwork (if none present)
-- File renaming ("Artist - Title.mp3" for YouTube; keep parentheses if SoundCloud)
+- File renaming ("Artist - Title.mp3" for YouTube; keep parentheses for SoundCloud)
 
 Utilizes:
 - core.file_utils (sanitize_filename, remove_unwanted_brackets)
@@ -33,21 +33,20 @@ from core.metadata_utils import (
     check_metadata
 )
 
-
 def download_track(link, output_dir, quality="320"):
     """
     Downloads an audio track from a link (YouTube, SoundCloud, etc.) using yt_dlp.
     Returns (final_file_path, info_dict) or (None, info_dict).
 
     After download:
-      1) Identify if it's SoundCloud or YouTube (or other).
+      1) Identify if it's SoundCloud or another source.
       2) Gather artist/title from info_dict or ID3 (depending on source).
       3) Glean year/genre.
       4) Update ID3 tags.
-      5) If missing cover, fetch + embed.
+      5) If missing cover, fetch and embed album art.
       6) Rename the file:
-         - SoundCloud => "title.mp3" (keep parentheses).
-         - Others     => "Artist - Title.mp3" (remove bracketed text).
+         - For SoundCloud: "title.mp3" (keeping parentheses).
+         - Otherwise: "Artist - Title.mp3" (with bracketed text removed).
       7) Print final metadata.
     """
     print(f"{MSG_STATUS}Downloading from link: {link}")
@@ -70,9 +69,19 @@ def download_track(link, output_dir, quality="320"):
                 print(f"{MSG_ERROR}No info returned by yt_dlp.")
                 return None, None
 
-            downloaded_file_path = None
-            if 'requested_downloads' in info_dict and info_dict['requested_downloads']:
-                downloaded_file_path = info_dict['requested_downloads'][0].get('filepath')
+            # If the result is a playlist, use the first entry.
+            if "entries" in info_dict and info_dict["entries"]:
+                info_dict = info_dict["entries"][0]
+
+            # Use prepare_filename to get the expected file path.
+            downloaded_file_path = ydl.prepare_filename(info_dict)
+
+            # Fix extension if needed:
+            if downloaded_file_path:
+                if downloaded_file_path.endswith(".opus"):
+                    downloaded_file_path = downloaded_file_path.rsplit('.', 1)[0] + ".mp3"
+                elif downloaded_file_path.endswith(".NA"):
+                    downloaded_file_path = downloaded_file_path.rsplit('.', 1)[0] + ".mp3"
 
             if not downloaded_file_path or not os.path.exists(downloaded_file_path):
                 print(f"{MSG_ERROR}File not found after download. Possibly a postprocessing error. Expected path: {downloaded_file_path}")
@@ -80,49 +89,41 @@ def download_track(link, output_dir, quality="320"):
 
             print(f"{MSG_SUCCESS}Downloaded file: {downloaded_file_path}")
 
-            # 1) Check if it's SoundCloud
+            # 1) Determine if the source is SoundCloud.
             soundcloud = ("soundcloud.com" in link.lower())
 
-            # 2) Glean or read artist/title differently for SoundCloud vs others
+            # 2) Get artist/title.
             if soundcloud:
-                # SoundCloud logic
+                # For SoundCloud, use uploader and exact title.
                 artist = info_dict.get("uploader", "Unknown Artist")
-                # Keep the exact title from SoundCloud
                 title = info_dict.get("title", "Unknown Title")
                 print(f"{MSG_DEBUG}SoundCloud link detected; using SoundCloud-specific logic.")
             else:
-                # YouTube or other logic
                 artist, title = glean_artist_title(downloaded_file_path, info_dict)
-                # Typically remove bracket text for YouTube style
                 title = remove_unwanted_brackets(title)
 
-            # 3) glean year & genre
+            # 3) Glean year & genre.
             year, genre = glean_year_genre(info_dict, artist, title)
 
-            # 4) update ID3 tags
+            # 4) Update ID3 tags.
             success = update_id3_tags(downloaded_file_path, artist, title, year, genre)
 
             final_path = downloaded_file_path
             if success:
-                # 5) if missing cover, embed
+                # 5) If missing cover, attempt to fetch and embed.
                 if not has_embedded_cover(downloaded_file_path):
-                    cover_url = None
-                    # If SoundCloud, try the thumbnail first
-                    if soundcloud:
-                        cover_url = info_dict.get("thumbnail")
-
+                    cover_url = info_dict.get("thumbnail") if soundcloud else None
                     if not cover_url:
                         cover_url = fetch_album_cover(title, artist)
-
                     if cover_url:
                         download_crop_and_attach_cover(downloaded_file_path, cover_url)
                     else:
                         print(f"{MSG_WARNING}No album cover found.")
 
-                # 6) rename the file
+                # 6) Rename file.
                 final_path = rename_file(downloaded_file_path, artist, title, soundcloud)
 
-                # 7) print final metadata
+                # 7) Print final metadata.
                 check_metadata(final_path)
 
             return final_path, info_dict
@@ -137,17 +138,14 @@ def download_track(link, output_dir, quality="320"):
 
 def rename_file(original_path, artist, title, soundcloud=False):
     """
-    For SoundCloud:
-      - filename => title.mp3 (keep parentheses, do not remove bracket text).
-    For others (YouTube, etc.):
-      - filename => Artist - Title.mp3 (remove bracket text).
+    Renames the downloaded file.
+    For SoundCloud: filename becomes "title.mp3" (retaining parentheses).
+    For other sources: "Artist - Title.mp3" with bracketed text removed.
     """
     try:
         if soundcloud:
-            # SoundCloud: just 'title.mp3'
             new_basename = sanitize_filename(f"{title}.mp3")
         else:
-            # Non-SoundCloud: "Artist - Title.mp3"
             if not artist.strip():
                 artist = "Unknown Artist"
             if not title.strip():
@@ -155,7 +153,6 @@ def rename_file(original_path, artist, title, soundcloud=False):
             new_basename = sanitize_filename(f"{artist} - {title}.mp3")
 
         new_path = os.path.join(os.path.dirname(original_path), new_basename)
-
         if new_path != original_path:
             os.rename(original_path, new_path)
             print(f"{MSG_SUCCESS}Renamed file to: {new_path}")
@@ -169,7 +166,8 @@ def rename_file(original_path, artist, title, soundcloud=False):
 
 def process_links_interactively():
     """
-    Asks user for links in a loop and downloads them. Type 'q' to quit.
+    Prompts user for links in a loop and downloads them.
+    Type 'q' to quit.
     """
     if not os.path.exists(DOWNLOAD_FOLDER_NAME):
         os.makedirs(DOWNLOAD_FOLDER_NAME)
@@ -189,24 +187,20 @@ def process_links_interactively():
 
 def process_links_from_file():
     """
-    Reads a list of links from LINKS_FILE (default: links.txt) and downloads them.
-    If the file doesn't exist, it will be created, and the user is prompted
-    to add links or switch to interactive mode.
+    Reads a list of links from LINKS_FILE and downloads them.
+    If the file does not exist, creates it and prompts the user.
     """
-    # Make sure the directory for LINKS_FILE exists
     dir_path = os.path.dirname(LINKS_FILE)
     if dir_path and not os.path.exists(dir_path):
         os.makedirs(dir_path, exist_ok=True)
 
-    # Create file if missing
     if not os.path.exists(LINKS_FILE):
         with open(LINKS_FILE, "w", encoding="utf-8"):
             pass
-        print(f"{MSG_WARNING}File '{LINKS_FILE}' not found, so a new file has been created.")
-        print(f"{MSG_WARNING}Please edit '{LINKS_FILE}' to add your links or return to interactive mode.")
+        print(f"{MSG_WARNING}File '{LINKS_FILE}' not found; created a new file.")
+        print(f"{MSG_WARNING}Please add your links to '{LINKS_FILE}' or use interactive mode.")
         return
 
-    # Collect links
     with open(LINKS_FILE, "r", encoding="utf-8") as f:
         links = [line.strip() for line in f if line.strip()]
 
@@ -219,10 +213,8 @@ def process_links_from_file():
         print(f"{MSG_NOTICE}Created download folder: {DOWNLOAD_FOLDER_NAME}")
 
     print(f"{MSG_STATUS}Processing {len(links)} links from file '{LINKS_FILE}'\n{LINE_BREAK}")
-
     for link in links:
         download_track(link, DOWNLOAD_FOLDER_NAME)
-
     print(f"{MSG_NOTICE}All downloads completed from {LINKS_FILE}")
 
 
