@@ -354,24 +354,24 @@ def main():
         parser.print_help()
         return
 
-    if args.command == "download_music":
+    if args.command == "dl_audio":
         print(f"{MSG_STATUS}Starting 'download_music' subcommand...\n{LINE_BREAK}")
         handle_download_music_subcommand(args)
 
-    elif args.command == "download_pexel":
+    elif args.command == "dl_pexel":
         print(f"{MSG_STATUS}Starting 'download_pexel' subcommand...\n{LINE_BREAK}")
         handle_download_pexel_subcommand(args)
 
-    elif args.command == "covers":
-        print(f"{MSG_STATUS}Starting 'covers' subcommand...\n{LINE_BREAK}")
+    elif args.command == "create_ac":
+        print(f"{MSG_STATUS}Starting 'create album covers' subcommand...\n{LINE_BREAK}")
         handle_create_album_covers_subcommand(args)
 
-    elif args.command == "organize":
-        print(f"{MSG_STATUS}Starting 'organize' subcommand...\n{LINE_BREAK}")
+    elif args.command == "org_dl":
+        print(f"{MSG_STATUS}Starting 'organize download' subcommand...\n{LINE_BREAK}")
         handle_organize_subcommand(args)
 
-    elif args.command == "upload":
-        print(f"{MSG_STATUS}Starting 'upload' subcommand...\n{LINE_BREAK}")
+    elif args.command == "up_mixes":
+        print(f"{MSG_STATUS}Starting 'upload mixcloud mixes' subcommand...\n{LINE_BREAK}")
         handle_mixcloud_subcommand(args)
 
     elif args.command == "test":
