@@ -257,27 +257,34 @@ def load_user_py_settings_as_dict():
             code = f.read()
         exec(code, user_namespace, user_namespace)
     except Exception as e:
-        print(f"{MSG_ERROR}Could not execute user_settings.py: {e}")
+        if DEBUG_MODE:
+            print(f"{MSG_ERROR}Could not execute user_settings.py, might be loaded via .env: {e}")
     return user_namespace
 
 USER_PY_CFG = load_user_py_settings_as_dict()
 # Override environment-derived variables only if not already set via .env
 if not MIXCLOUD_CLIENT_ID and "MIXCLOUD_CLIENT_ID" in USER_PY_CFG:
     MIXCLOUD_CLIENT_ID = USER_PY_CFG["MIXCLOUD_CLIENT_ID"]
+    print(f"{MSG_NOTICE}Overriding MIXCLOUD_CLIENT_ID from user_settings.py")
 if not MIXCLOUD_CLIENT_SECRET and "MIXCLOUD_CLIENT_SECRET" in USER_PY_CFG:
     MIXCLOUD_CLIENT_SECRET = USER_PY_CFG["MIXCLOUD_CLIENT_SECRET"]
+    print(f"{MSG_NOTICE}Overriding MIXCLOUD_CLIENT_SECRET from user_settings.py")
 if not SPOTIFY_CLIENT_ID and "SPOTIFY_CLIENT_ID" in USER_PY_CFG:
     SPOTIFY_CLIENT_ID = USER_PY_CFG["SPOTIFY_CLIENT_ID"]
+    print(f"{MSG_NOTICE}Overriding SPOTIFY_CLIENT_ID from user_settings.py")
 if not SPOTIFY_CLIENT_SECRET and "SPOTIFY_CLIENT_SECRET" in USER_PY_CFG:
     SPOTIFY_CLIENT_SECRET = USER_PY_CFG["SPOTIFY_CLIENT_SECRET"]
+    print(f"{MSG_NOTICE}Overriding SPOTIFY_CLIENT_SECRET from user_settings.py")
 if not LASTFM_API_KEY and "LASTFM_API_KEY" in USER_PY_CFG:
     LASTFM_API_KEY = USER_PY_CFG["LASTFM_API_KEY"]
-if not DEEZER_API_KEY and "DEEZER_API_KEY" in USER_PY_CFG:
-    DEEZER_API_KEY = USER_PY_CFG["DEEZER_API_KEY"]
-if not MUSICBRAINZ_API_TOKEN and "MUSICBRAINZ_API_TOKEN" in USER_PY_CFG:
-    MUSICBRAINZ_API_TOKEN = USER_PY_CFG["MUSICBRAINZ_API_TOKEN"]
+    print(f"{MSG_NOTICE}Overriding LASTFM_API_KEY from user_settings.py")               
+# if not DEEZER_API_KEY and "DEEZER_API_KEY" in USER_PY_CFG:
+#     DEEZER_API_KEY = USER_PY_CFG["DEEZER_API_KEY"]
+# if not MUSICBRAINZ_API_TOKEN and "MUSICBRAINZ_API_TOKEN" in USER_PY_CFG:
+#     MUSICBRAINZ_API_TOKEN = USER_PY_CFG["MUSICBRAINZ_API_TOKEN"]
 if not PEXEL_API_KEY and "PEXEL_API_KEY" in USER_PY_CFG:
     PEXEL_API_KEY = USER_PY_CFG["PEXEL_API_KEY"]
+    print(f"{MSG_NOTICE}Overriding PEXEL_API_KEY from user_settings.py")
 
 # ----------------------------------------------------------------
 #   REMINDER: DO NOT STORE SECRETS IN THIS FILE; USE .env INSTEAD.
@@ -294,7 +301,5 @@ MIXCLOUD_CLIENT_SECRET=""
 SPOTIFY_CLIENT_ID=""
 SPOTIFY_CLIENT_SECRET=""
 LASTFM_API_KEY=""
-DEEZER_API_KEY=""
-MUSICBRAINZ_API_TOKEN=""
 PEXEL_API_KEY=""
 """

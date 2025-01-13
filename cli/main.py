@@ -29,7 +29,7 @@ from modules.download.download_pexel import search_and_download_photos
 from modules.organize.organize_files import organize_downloads
 from mixcloud_cli import handle_mixcloud_subcommand
 from core.color_utils import (
-    COLOR_GREEN, COLOR_CYAN, COLOR_RESET,
+    COLOR_GREEN, COLOR_CYAN, COLOR_RESET, COLOR_BLUE, COLOR_YELLOW,
     MSG_STATUS, MSG_NOTICE, MSG_WARNING, MSG_ERROR, LINE_BREAK, MSG_SUCCESS, MSG_DEBUG
 )
 from config.settings import (
@@ -41,6 +41,8 @@ from config.settings import (
     DEBUG_MODE, LINKS_FILE, USER_CONFIG_FOLDER,
     ensure_user_py_settings, load_user_py_settings_as_dict,
     LOCAL_TRACK_DIR, EXTERNAL_TRACK_DIR, USE_EXTERNAL_TRACK_DIR,
+    DJ_POOL_BASE_PATH, COVER_IMAGE_DIRECTORY, FINISHED_DIRECTORY,
+    PUBLISHED_DATES, TITLES_FILE, UPLOAD_LINKS_FILE,
     
 )
 
@@ -71,21 +73,28 @@ def print_loaded_configurations():
     if DEBUG_MODE is True.
     """
     print(f"{MSG_STATUS}Loaded Settings:")
-    print(f"{MSG_DEBUG}DEBUG_MODE: {DEBUG_MODE}")
+    print(f"{MSG_DEBUG}DEBUG_MODE: {COLOR_GREEN}{DEBUG_MODE}")
     print(f"  {MSG_NOTICE}API Keys:")
-    print(f"    {MSG_DEBUG}MIXCLOUD_CLIENT_ID: {MIXCLOUD_CLIENT_ID}")
-    print(f"    {MSG_DEBUG}SPOTIFY_CLIENT_ID: {SPOTIFY_CLIENT_ID}")
-    print(f"    {MSG_DEBUG}LASTFM_API_KEY: {LASTFM_API_KEY}")
+    print(f"    {MSG_DEBUG}MIXCLOUD_CLIENT_ID: {COLOR_GREEN}{MIXCLOUD_CLIENT_ID}")
+    print(f"    {MSG_DEBUG}SPOTIFY_CLIENT_ID: {COLOR_GREEN}{SPOTIFY_CLIENT_ID}")
+    print(f"    {MSG_DEBUG}LASTFM_API_KEY: {COLOR_GREEN}{LASTFM_API_KEY}")
     # print(f"    {MSG_DEBUG}DEEZER_API_KEY: {DEEZER_API_KEY}")
     # print(f"    {MSG_DEBUG}MUSICBRAINZ_API_TOKEN: {MUSICBRAINZ_API_TOKEN}")
-    print(f"    {MSG_DEBUG}PEXEL_API_KEY: {PEXEL_API_KEY}")
-    print(f"  {MSG_NOTICE}Files & Paths:")
-    print(f"    {MSG_DEBUG}DOWNLOADS_FOLDER: {DOWNLOAD_FOLDER_NAME}")
-    print(f"    {MSG_DEBUG}LINKS_FILE: {LINKS_FILE}")
+    print(f"    {MSG_DEBUG}PEXEL_API_KEY: {COLOR_GREEN}{PEXEL_API_KEY}")
+    print(f"  {MSG_NOTICE}Folder Paths:")
+    print(f"    {MSG_DEBUG}DJ_POOL_BASE_PATH: {COLOR_GREEN}{DJ_POOL_BASE_PATH}")
+    print(f"    {MSG_DEBUG}DOWNLOADS_FOLDER: {COLOR_GREEN}{DOWNLOAD_FOLDER_NAME}")
+    print(f"    {MSG_DEBUG}COVER_IMAGE_DIRECTORY ({COLOR_YELLOW}up_mixes{COLOR_RESET}): {COLOR_GREEN}{COVER_IMAGE_DIRECTORY}")
+    print(f"    {MSG_DEBUG}FINISHED_DIRECTORY ({COLOR_YELLOW}up_mixes{COLOR_RESET}): {COLOR_GREEN}{FINISHED_DIRECTORY}")
+    print(f"    {MSG_DEBUG}PUBLISHED_DATES ({COLOR_YELLOW}up_mixes{COLOR_RESET}): {COLOR_GREEN}{PUBLISHED_DATES}")
+    print(f"    {MSG_DEBUG}TITLES_FILE ({COLOR_YELLOW}up_mixes): {COLOR_GREEN}{TITLES_FILE}")
+    print(f"  {MSG_NOTICE}File Paths:")
+    print(f"    {MSG_DEBUG}UPLOAD_LINKS_FILE ({COLOR_YELLOW}up_mixes{COLOR_RESET}): {COLOR_GREEN}{UPLOAD_LINKS_FILE}")
+    print(f"    {MSG_DEBUG}LINKS_FILE ({COLOR_YELLOW}dl_audio{COLOR_RESET}): {COLOR_GREEN}{LINKS_FILE}")
     if USE_EXTERNAL_TRACK_DIR:
-        print(f"    {MSG_DEBUG}EXTERNAL_TRACK_DIR: {EXTERNAL_TRACK_DIR}")
+        print(f"    {MSG_DEBUG}EXTERNAL_TRACK_DIR: {COLOR_GREEN}{EXTERNAL_TRACK_DIR}")
     else:
-        print(f"    {MSG_DEBUG}LOCAL_TRACK_DIR: {LOCAL_TRACK_DIR}")
+        print(f"    {MSG_DEBUG}LOCAL_TRACK_DIR: {COLOR_GREEN}{LOCAL_TRACK_DIR}")
     print(LINE_BREAK)
 
 

@@ -38,8 +38,7 @@ SPOTIFY_CLIENT_ID      = "PUT_YOUR_VALUE_HERE"
 SPOTIFY_CLIENT_SECRET  = "PUT_YOUR_VALUE_HERE"
 
 LASTFM_API_KEY         = "PUT_YOUR_VALUE_HERE"
-DEEZER_API_KEY         = "PUT_YOUR_VALUE_HERE"
-MUSICBRAINZ_API_TOKEN  = "PUT_YOUR_VALUE_HERE"
+
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # MIXCLOUD SETTINGS
@@ -89,7 +88,6 @@ APIS = {
     "deezer": {
         "enabled": True,
         "url": "https://api.deezer.com/search",
-        "api_key": DEEZER_API_KEY,
     },
     "lastfm": {
         "enabled": True,
@@ -100,7 +98,6 @@ APIS = {
         "enabled": True,
         "url": "https://musicbrainz.org/ws/2/recording",
         "cover_art_url": "https://coverartarchive.org/release/",
-        "api_token": MUSICBRAINZ_API_TOKEN,
     },
     "mixcloud": {
         "enabled": MIXCLOUD_ENABLED,
