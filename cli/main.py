@@ -305,7 +305,8 @@ def setup_argparser():
     covers_parser = subparsers.add_parser("create_ac", help="Create album covers from images.")
 
     # Mixcloud Upload
-    subparsers.add_parser("up_mixes", help="Upload multiple tracks to Mixcloud.")
+    mixcloud_parser = subparsers.add_parser("up_mixes", help="Upload multiple tracks to Mixcloud.")
+    mixcloud_parser.add_argument("--init-settings", action="store_true", help="Initialize MixCloud Content.")
 
     # Testing
     test_parser = subparsers.add_parser("test", help="Run tests.")

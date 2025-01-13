@@ -16,6 +16,7 @@ Key Steps:
 import os
 import sys
 import argparse
+import csv
 
 # Adjust path if needed to ensure your modules are accessible
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -32,7 +33,8 @@ from config.settings import (
     LOCAL_TRACK_DIR,
     EXTERNAL_TRACK_DIR,
     COVER_IMAGE_DIRECTORY,
-    DEBUG_MODE
+    DEBUG_MODE, PUBLISHED_DATES, TITLES_FILE, UPLOAD_LINKS_FILE, FINISHED_DIRECTORY,
+    DJ_POOL_BASE_PATH
 )
 from core.color_utils import (
     MSG_STATUS, MSG_ERROR, MSG_NOTICE, MSG_WARNING,
@@ -88,8 +90,13 @@ def handle_mixcloud_subcommand(args):
     """
     Orchestrates the checks before calling run_mixcloud_upload.
     """
-    print(f"{MSG_STATUS}Checking directories before Mixcloud upload...")
 
+    if args.init_settings:
+        print(f"{MSG_NOTICE}Initializing Mixcloud settings...")
+        create_mixcloud_files()
+        return
+
+    print(f"{MSG_STATUS}Checking directories before Mixcloud upload...")
     ok, message = check_directories()
     print(message)
     if not ok:
@@ -99,6 +106,65 @@ def handle_mixcloud_subcommand(args):
     print(f"{MSG_STATUS}Starting Mixcloud upload flow...\n")
     # Here we call run_mixcloud_upload from the modules/mixcloud/uploader.
     run_mixcloud_upload()
+
+#########################################################
+#                 CREATE CONFIGURATION
+#########################################################
+
+# Boolean to check if configuration files & path exist
+def check_mixcloud_config():
+    return all(
+        os.path.exists(p) for p in [    
+            PUBLISHED_DATES, TITLES_FILE, UPLOAD_LINKS_FILE,
+            COVER_IMAGE_DIRECTORY, FINISHED_DIRECTORY
+        ]
+    )
+
+def create_mixcloud_files():
+    """
+    Create necessary files and directories for Mixcloud automation if they do not exist.
+    """
+    try:
+        # Ensure the base directory exists
+        os.makedirs(DJ_POOL_BASE_PATH, exist_ok=True)
+
+        # File creation
+        files_to_create = {
+            PUBLISHED_DATES: "",
+            UPLOAD_LINKS_FILE: ""
+        }
+
+        for file, content in files_to_create.items():
+            # Ensure the file's parent directory exists
+            file_dir = os.path.dirname(file)
+            os.makedirs(file_dir, exist_ok=True)
+
+            if not os.path.exists(file):
+                with open(file, 'w') as f:
+                    f.write(content)
+                print(f"{MSG_NOTICE}Created {file}")
+
+        # Titles file with CSV header
+        if not os.path.exists(TITLES_FILE):
+            with open(TITLES_FILE, 'w', encoding='utf-8') as f:
+                writer = csv.DictWriter(f, fieldnames=["title", "description"])
+                writer.writeheader()
+            print(f"{MSG_NOTICE}Created {TITLES_FILE}")
+
+        # Directory creation
+        directories_to_create = [
+            COVER_IMAGE_DIRECTORY,
+            FINISHED_DIRECTORY
+        ]
+
+        for directory in directories_to_create:
+            os.makedirs(directory, exist_ok=True)
+            print(f"{MSG_NOTICE}Created {directory}")
+
+        print(f"{MSG_SUCCESS}Configuration files and directories created.")
+
+    except Exception as e:
+        print(f"{MSG_ERROR}An error occurred: {str(e)}")
 
 
 def main():
