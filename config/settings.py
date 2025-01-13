@@ -11,6 +11,25 @@ import sys
 import shutil
 from dotenv import load_dotenv
 
+# Color Codes
+COLOR_RESET = "\033[0m"
+COLOR_RED = "\033[31m"
+COLOR_GREEN = "\033[32m"
+COLOR_YELLOW = "\033[33m"
+COLOR_BLUE = "\033[34m"
+COLOR_PURPLE = "\033[35m"
+COLOR_CYAN = "\033[36m"
+COLOR_GREY = "\033[37m"
+
+# Message Prefixes
+MSG_ERROR = f"{COLOR_RED}[Error]{COLOR_RESET}: "
+MSG_NOTICE = f"{COLOR_YELLOW}[Notice]{COLOR_RESET}: "
+MSG_DEBUG = f"{COLOR_CYAN}[Debug]{COLOR_RESET}: "
+MSG_SUCCESS = f"{COLOR_GREEN}[Success]{COLOR_RESET}: "
+MSG_STATUS = f"{COLOR_GREEN}[Status]{COLOR_RESET}: "
+MSG_WARNING = f"{COLOR_BLUE}[Warning]{COLOR_RESET}: "
+LINE_BREAK = f"{COLOR_GREY}----------------------------------------{COLOR_RESET}"
+
 # ----------------------------------------------------------------
 #             LOAD .ENV FILE VARIABLES (IF PRESENT)
 # ----------------------------------------------------------------
@@ -187,9 +206,9 @@ def ensure_album_cover_config():
         if not os.path.exists(DEFAULT_JSON_PATH):
             raise FileNotFoundError(f"Default album cover config not found at {DEFAULT_JSON_PATH}")
         shutil.copyfile(DEFAULT_JSON_PATH, USER_CONFIG_PATH)
-        print(f"[Notice]: Created user album cover config at {USER_CONFIG_PATH}. Please edit to customize album covers.")
+        print(f"{MSG_NOTICE}Created user album cover config at {USER_CONFIG_PATH}. Please edit to customize album covers.")
     else:
-        print(f"[Status]: Using existing album cover config at {USER_CONFIG_PATH}.")
+        print(f"{MSG_STATUS}Using existing album cover config at {USER_CONFIG_PATH}.")
     return USER_CONFIG_PATH
 
 ALBUM_COVER_CONFIG = {}
@@ -198,16 +217,16 @@ try:
     with open(user_json_path, "r", encoding="utf-8") as f:
         ALBUM_COVER_CONFIG = json.load(f)
 except Exception as e:
-    print(f"[Error]: Could not load albumCoverConfig.json: {e}")
+    print(f"{MSG_ERROR}Could not load albumCoverConfig.json: {e}")
     ALBUM_COVER_CONFIG = {}
 
 GLOBAL_SETTINGS = ALBUM_COVER_CONFIG.get("GLOBAL_SETTINGS", {})
 CONFIGURATIONS = ALBUM_COVER_CONFIG.get("CONFIGURATIONS", {})
 
 PASTE_LOGO = GLOBAL_SETTINGS.get("PASTE_LOGO", True)
-ORIGINAL_IMAGES_FOLDER = GLOBAL_SETTINGS.get("ORIGINAL_IMAGES_FOLDER", "")
-DESTINATION_FOLDER = GLOBAL_SETTINGS.get("DESTINATION_FOLDER", "")
-OUTPUT_FOLDER = GLOBAL_SETTINGS.get("OUTPUT_FOLDER", "")
+ORIGINAL_IMAGES_FOLDER = os.path.join(USER_DOCS, "DJCLI", "content", "albumCovers", "pexel")
+DESTINATION_FOLDER = os.path.join(USER_DOCS, "DJCLI", "content", "albumCovers", "pexel_processed")
+OUTPUT_FOLDER = os.path.join(USER_DOCS, "DJCLI", "content", "albumCovers", "albumCovers_output")
 
 # ----------------------------------------------------------------
 #   PYTHON-BASED SETTINGS CONFIGURATION (for user overrides)
@@ -226,19 +245,19 @@ def ensure_user_py_settings():
             raise FileNotFoundError(f"Default Python settings not found at {DEFAULT_PY_SETTINGS}")
         shutil.copyfile(DEFAULT_PY_SETTINGS, USER_PY_SETTINGS)
         print(f"[Notice]: Copied default_settings.py to {USER_PY_SETTINGS}.")
-    else:
-        print(f"[Status]: Using existing user_settings at {USER_PY_SETTINGS}.")
     return USER_PY_SETTINGS
 
 def load_user_py_settings_as_dict():
     user_file = ensure_user_py_settings()
+    if user_file:
+        print(f"{MSG_STATUS}Found user settings from {user_file}")
     user_namespace = {}
     try:
         with open(user_file, "r", encoding="utf-8") as f:
             code = f.read()
         exec(code, user_namespace, user_namespace)
     except Exception as e:
-        print(f"[Error]: Could not execute user_settings.py: {e}")
+        print(f"{MSG_ERROR}Could not execute user_settings.py: {e}")
     return user_namespace
 
 USER_PY_CFG = load_user_py_settings_as_dict()

@@ -221,6 +221,10 @@ def handle_config_subcommand(args):
     else:
         print(f"{MSG_WARNING}They might be in .env but not loaded into settings.py. Check your logic.")
 
+# ----------------------------------------------------------------
+#          Utility Functions
+# ----------------------------------------------------------------
+
 def parse_env_file(env_path):
     if not os.path.exists(env_path):
         return {}
@@ -251,7 +255,7 @@ def setup_argparser():
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Download Music
-    download_music_parser = subparsers.add_parser("download_music", help="Download audio from links.")
+    download_music_parser = subparsers.add_parser("dl_audio", help="Download audio from Youtube/SoundCloud links.")
     download_music_parser.add_argument("--mode",
         choices=["interactive", "file"],
         default="interactive",
@@ -262,8 +266,15 @@ def setup_argparser():
         help="Organize after download."
     )
 
+    # Organize
+    organize_parser = subparsers.add_parser("org_dl", help="Organize downloaded audio files.")
+    organize_parser.add_argument("--requested",
+        action="store_true",
+        help="Only organize requested songs."
+    )
+
     # Download Pexels
-    download_pexel_parser = subparsers.add_parser("download_pexel", help="Download photos from Pexels.")
+    download_pexel_parser = subparsers.add_parser("dl_pexel", help="Download photos from Pexels.")
     download_pexel_parser.add_argument("--num_photos",
         type=int,
         default=5,
@@ -271,17 +282,10 @@ def setup_argparser():
     )
 
     # Covers
-    covers_parser = subparsers.add_parser("covers", help="Create album covers from images.")
-
-    # Organize
-    organize_parser = subparsers.add_parser("organize", help="Organize downloaded files.")
-    organize_parser.add_argument("--requested",
-        action="store_true",
-        help="Only organize requested songs."
-    )
+    covers_parser = subparsers.add_parser("create_ac", help="Create album covers from images.")
 
     # Mixcloud Upload
-    subparsers.add_parser("upload", help="Upload multiple tracks to Mixcloud.")
+    subparsers.add_parser("up_mixes", help="Upload multiple tracks to Mixcloud.")
 
     # Testing
     test_parser = subparsers.add_parser("test", help="Run tests.")
@@ -302,6 +306,10 @@ def setup_argparser():
 
     return parser
 
+# ----------------------------------------------------------------
+#          Main Function for CLI
+# ----------------------------------------------------------------
+
 def main():
     add_project_root_to_path()
     print(banner())
@@ -312,7 +320,7 @@ def main():
         from config.settings import ensure_user_py_settings, load_user_py_settings_as_dict, DEFAULT_PY_SETTINGS
         user_settings_path = ensure_user_py_settings()
         user_cfg = load_user_py_settings_as_dict()
-        print(f"{MSG_STATUS}Loaded user settings from: {user_settings_path}")
+        print(f"{MSG_STATUS}Loaded user settings from: {user_settings_path}\n")
         # Optionally override specific settings:
         global MIXCLOUD_CLIENT_ID, MIXCLOUD_CLIENT_SECRET, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET
         global LASTFM_API_KEY, DEEZER_API_KEY, MUSICBRAINZ_API_TOKEN, PEXEL_API_KEY
@@ -367,7 +375,7 @@ def main():
         handle_mixcloud_subcommand(args)
 
     elif args.command == "test":
-        print(f"{MSG_STATUS}Running custom tests or debug checks...{LINE_BREAK}")
+        print(f"{MSG_STATUS}Running custom tests or debug checks...\n{LINE_BREAK}")
         from cli.test_cli import handle_test_subcommand
         handle_test_subcommand(args)
 
