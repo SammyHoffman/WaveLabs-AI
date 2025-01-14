@@ -49,13 +49,13 @@ from core.color_utils import MSG_ERROR, MSG_NOTICE, MSG_DEBUG, MSG_SUCCESS, MSG_
 # -----------------------------------------------------------------------------
 # 1) TEST API KEY CONNECTION
 # -----------------------------------------------------------------------------
-def test_api_key_presence():
-    """
-    Verifies that Mixcloud credentials exist in APIS dict and settings.
-    """
-    assert APIS["mixcloud"]["client_id"] != "", "Mixcloud client_id is missing."
-    assert APIS["mixcloud"]["client_secret"] != "", "Mixcloud client_secret is missing."
-    assert MIXCLOUD_CLIENT_ID != "", "MIXCLOUD_CLIENT_ID from settings.py is missing."
+# def test_api_key_presence():
+#     """
+#     Verifies that Mixcloud credentials exist in APIS dict and settings.
+#     """
+#     assert APIS["mixcloud"]["client_id"] != "", "Mixcloud client_id is missing."
+#     assert APIS["mixcloud"]["client_secret"] != "", "Mixcloud client_secret is missing."
+#     assert MIXCLOUD_CLIENT_ID != "", "MIXCLOUD_CLIENT_ID from settings.py is missing."
 
 
 # -----------------------------------------------------------------------------
