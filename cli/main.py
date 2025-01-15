@@ -17,7 +17,8 @@ import re
 # 1) Add the project root to sys.path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
-    sys.path.append(project_root)
+    # sys.path.append(project_root)
+    sys.path.insert(0, project_root)
 
 # 2) Import modules and settings
 from modules.download.downloader import (
@@ -27,7 +28,7 @@ from modules.download.downloader import (
 from modules.covers.create_album_cover import main as create_album_covers_main, test_run_album_covers
 from modules.download.download_pexel import search_and_download_photos
 from modules.organize.organize_files import organize_downloads
-from mixcloud_cli import handle_mixcloud_subcommand
+from cli.mixcloud_cli import handle_mixcloud_subcommand
 from core.color_utils import (
     COLOR_GREEN, COLOR_CYAN, COLOR_RESET, COLOR_BLUE, COLOR_YELLOW,
     MSG_STATUS, MSG_NOTICE, MSG_WARNING, MSG_ERROR, LINE_BREAK, MSG_SUCCESS, MSG_DEBUG
