@@ -3,13 +3,9 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Python Tests](https://github.com/Katazui/DJAutomation/actions/workflows/python-tests.yml/badge.svg)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Katazui/DJAutomation.svg)
-![GitHub Pull Requests](https://img.shields.io/github/issues-pr/Katazui/DJAutomation.svg)
-![GitHub Issues](https://img.shields.io/github/issues/Katazui/DJAutomation.svg)
-![GitHub Contributors](https://img.shields.io/github/contributors/Katazui/DJAutomation.svg)
-![GitHub Last Commit](https://img.shields.io/github/last-commit/Katazui/DJAutomation.svg)
-![GitHub Issues Closed](https://img.shields.io/github/issues-closed/Katazui/DJAutomation.svg)
-![GitHub Release](https://img.shields.io/github/release/Katazui/DJAutomation.svg)
 ![Repo Size](https://img.shields.io/github/repo-size/Katazui/DJAutomation.svg)
+![GitHub Release](https://img.shields.io/github/release/Katazui/DJAutomation.svg)
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Donate-yellow.svg?style=flat)](https://buymeacoffee.com/katazui)
 ![GitHub Forks](https://img.shields.io/github/forks/Katazui/DJAutomation?style=social&label=Fork)
 ![GitHub Stars](https://img.shields.io/github/stars/Katazui/DJAutomation?style=social&label=Stars)
 
@@ -20,6 +16,8 @@ Welcome to the **DJ Automation CLI**! This powerful tool streamlines your DJ wor
 **VERSION: 1.0.0-alpha**
 
 **LAST UPDATE 1/13/25: Documentation will be updated with the correct details. Many of the functions still work as intended.**
+
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/katazui)
 
 ---
 

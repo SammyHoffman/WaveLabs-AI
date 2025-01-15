@@ -13,7 +13,7 @@ install_requires = parse_requirements('requirements.txt')
 
 setup(
     name='djautomation',                 # Package name
-    version='1.0.0-alpha',               # Initial version in alpha
+    version='1.1.0-alpha',               # Initial version in alpha
     description='A CLI for DJ automation workflows.',  # Short description
     long_description=open('README.md').read(),         # Detailed description from README.md
     long_description_content_type='text/markdown',     # Description format
