@@ -13,7 +13,6 @@ import argparse
 import sys
 import os
 import re
-from __init__ import __version__
 # from djautomation import __version__
 
 # 1) Add the project root to sys.path
@@ -48,6 +47,8 @@ from config.settings import (
     PUBLISHED_DATES, TITLES_FILE, UPLOAD_LINKS_FILE,
     
 )
+
+from __init__ import __version__
 
 def banner():
     return f"""{COLOR_CYAN}
