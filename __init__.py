@@ -1,3 +1,3 @@
 # djautomation/__init__.py
 
-__version__ = '1.1.0-alpha'
+__version__ = '1.2.0-alpha'
