@@ -13,7 +13,8 @@ import argparse
 import sys
 import os
 import re
-from __init__ import __version__
+# from __init__ import __version__
+from djautomation import __version__
 
 # 1) Add the project root to sys.path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
