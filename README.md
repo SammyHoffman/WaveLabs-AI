@@ -13,8 +13,6 @@
 
 Welcome to the **DJ Automation CLI**! This powerful tool streamlines your DJ workflow by automating tasks such as downloading tracks, organizing files, generating AI covers, and uploading mixes to Mixcloud. Whether you're managing a personal collection or handling large-scale uploads, this CLI has got you covered. 🚀
 
-**Current Version:** {{VERSION}}
-
 **LAST UPDATE 1/13/25: Documentation will be updated with the correct details. Many of the functions still work as intended.**
 
 [![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/katazui)
