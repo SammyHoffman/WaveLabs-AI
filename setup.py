@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 import os
 import re
+from core.version import __version__
 
 def parse_requirements(filename):
     """
@@ -13,22 +14,10 @@ def parse_requirements(filename):
 # Load dependencies from requirements.txt
 install_requires = parse_requirements('requirements.txt')
 
-def read_version():
-    # Define the path to your __init__.py file where __version__ is set.
-    here = os.path.abspath(os.path.dirname(__file__))
-    init_path = os.path.join(here, '__init__.py')
-    with open(init_path, 'r', encoding='utf-8') as f:
-        init_contents = f.read()
-
-    version_match = re.search(r"^__version__\s*=\s*['\"]([^'\"]+)['\"]", init_contents, re.M)
-    if version_match:
-        return version_match.group(1)
-    raise RuntimeError("Unable to find version string in __init__.py")
-
 
 setup(
     name='djautomation',                 # Package name
-    version=read_version(),               # Initial version in alpha
+    version=__version__,               # Initial version in alpha
     description='A CLI for DJ automation workflows.',  # Short description
     long_description=open('README.md').read(),         # Detailed description from README.md
     long_description_content_type='text/markdown',     # Description format
