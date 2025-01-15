@@ -48,7 +48,7 @@ from config.settings import (
     
 )
 
-from __init__ import __version__
+from core.version import __version__
 
 def banner():
     return f"""{COLOR_CYAN}
