@@ -13,6 +13,7 @@ import argparse
 import sys
 import os
 import re
+from __init__ import __version__
 
 # 1) Add the project root to sys.path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -57,7 +58,7 @@ def banner():
 **************************************************
 *       Welcome to the DJ CLI by Katazui.com     *
 *  Control your entire DJ workflow in one place  *
-*            Version: 1.0.0-alpha                *      
+*            Version: {__version__}                *      
 **************************************************
 {COLOR_RESET}"""
 
