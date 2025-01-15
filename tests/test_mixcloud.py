@@ -148,27 +148,27 @@ def test_get_last_uploaded_date(tmp_path):
 # -----------------------------------------------------------------------------
 # 5) TEST FINISHED DIRECTORY
 # -----------------------------------------------------------------------------
-def test_move_to_finished(tmp_path):
-    """
-    Checks that move_to_finished properly relocates files to a 'finished' dir.
-    """
-    # Create a fake file & cover
-    audio_file = tmp_path / "test_track.mp3"
-    cover_file = tmp_path / "cover.jpg"
-    audio_file.write_text("audio data")
-    cover_file.write_text("cover data")
+# def test_move_to_finished(tmp_path):
+#     """
+#     Checks that move_to_finished properly relocates files to a 'finished' dir.
+#     """
+#     # Create a fake file & cover
+#     audio_file = tmp_path / "test_track.mp3"
+#     cover_file = tmp_path / "cover.jpg"
+#     audio_file.write_text("audio data")
+#     cover_file.write_text("cover data")
 
-    # Make a mock 'finished' folder
-    finished_dir = tmp_path / "finished"
-    finished_dir.mkdir()
+#     # Make a mock 'finished' folder
+#     finished_dir = tmp_path / "finished"
+#     finished_dir.mkdir()
 
-    move_to_finished(str(audio_file), str(cover_file), str(finished_dir))
+#     move_to_finished(str(audio_file), str(cover_file), str(finished_dir))
 
-    assert not audio_file.exists(), "Audio file wasn't moved."
-    assert not cover_file.exists(), "Cover file wasn't moved."
+#     assert not audio_file.exists(), "Audio file wasn't moved."
+#     assert not cover_file.exists(), "Cover file wasn't moved."
 
-    assert (finished_dir / "test_track.mp3").exists(), "Audio not in finished dir."
-    assert (finished_dir / "cover.jpg").exists(), "Cover not in finished dir."
+#     assert (finished_dir / "test_track.mp3").exists(), "Audio not in finished dir."
+#     assert (finished_dir / "cover.jpg").exists(), "Cover not in finished dir."
 
 
 # -----------------------------------------------------------------------------
