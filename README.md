@@ -1,4 +1,4 @@
-# 🎧 DJ Automation CLI
+# 🎧 WaveLabs AI Agent
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Python Tests](https://github.com/Katazui/DJAutomation/actions/workflows/python-tests.yml/badge.svg)
@@ -9,13 +9,11 @@
 ![GitHub Forks](https://img.shields.io/github/forks/Katazui/DJAutomation?style=social&label=Fork)
 ![GitHub Stars](https://img.shields.io/github/stars/Katazui/DJAutomation?style=social&label=Stars)
 
-![DJ Automation Banner](https://katazui.com/wp-content/uploads/2023/07/Katazui-Logo-1-300x188.png)
 
-Welcome to the **DJ Automation CLI**! This powerful tool streamlines your DJ workflow by automating tasks such as downloading tracks, organizing files, generating AI covers, and uploading mixes to Mixcloud. Whether you're managing a personal collection or handling large-scale uploads, this CLI has got you covered. 🚀
+Welcome to the **WaveLabs AI DJ Agent**! An intelligent agent that creates seamless DJ sets by analyzing music characteristics and mixing tracks like a professional DJ. Whether you're managing a personal collection or handling large-scale uploads, WaveLabs has got you covered. 🚀
 
 **LAST UPDATE 1/13/25: Documentation will be updated with the correct details. Many of the functions still work as intended.**
 
-[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/katazui)
 
 ---
 
@@ -96,6 +94,30 @@ DJAutomation/
 ├── .env                     # Environment variables (not committed)
 ├── requirements.txt         # Python dependencies
 └── README.md                # Project documentation
+ai-dj-agent/
+├── src/
+│   ├── init.py
+│   ├── agent.py          # Main AI DJ Agent implementation
+│   ├── track.py          # Track data model
+│   ├── analyzer.py       # Audio analysis functionality
+│   └── utils.py          # Utility functions
+├── tests/
+│   ├── init.py
+│   ├── test_agent.py
+│   ├── test_track.py
+│   ├── test_analyzer.py
+│   └── test_utils.py
+├── examples/
+│   └── create_dj_set.py
+├── docs/
+│   ├── installation.md
+│   ├── usage.md
+│   └── api.md
+├── requirements.txt
+├── setup.py
+├── LICENSE
+├── README.md
+└── .gitignore
 ```
 
 ---
@@ -182,7 +204,45 @@ Centralized configuration file that imports environment variables and sets defau
 ### 📥 Download Tracks
 
 **_TODO_**
+# src/track.py
 
+from dataclasses import dataclass
+from typing import Optional
+
+@dataclass
+class Track:
+    """Data model for a music track with its analyzed features."""
+    
+    path: str
+    title: str
+    bpm: float
+    key: str
+    energy: float
+    duration: float
+    genre: str
+    
+    # Additional optional metadata
+    artist: Optional[str] = None
+    album: Optional[str] = None
+    year: Optional[int] = None
+    
+    @property
+    def minutes(self) -> float:
+        """Get track duration in minutes."""
+        return self.duration / 60
+    
+    def is_compatible_key(self, other: 'Track') -> bool:
+        """Check if this track is harmonically compatible with another track."""
+        # TODO: Implement proper key compatibility logic
+        return self.key == other.key
+    
+    def tempo_difference(self, other: 'Track') -> float:
+        """Calculate the tempo difference with another track."""
+        return abs(self.bpm - other.bpm)
+    
+    def energy_difference(self, other: 'Track') -> float:
+        """Calculate the energy level difference with another track."""
+        return abs(self.energy - other.energy)
 ### 🎵 Upload to Mixcloud
 
 **_TODO_**
@@ -202,9 +262,150 @@ python cli/main.py test
 ```
 python cli/main.py test --mixcloud
 ```
+# src/analyzer.py
 
+import os
+import librosa
+import numpy as np
+from typing import Tuple, Dict, Any
+from deepseek import DeepSeekLLM
+from .track import Track
+
+class AudioAnalyzer:
+    """Handles audio analysis using librosa and DeepSeek."""
+    
+    def __init__(self, model_name: str = "deepseek-coder", api_key: Optional[str] = None):
+        self.llm = DeepSeekLLM(model_name=model_name, api_key=api_key)
+    
+    def analyze_file(self, file_path: str) -> Track:
+        """
+        Analyze an audio file and extract musical features.
+        
+        Args:
+            file_path: Path to the audio file
+            
+        Returns:
+            Track object containing analyzed features
+        """
+        # Extract basic audio features
+        basic_features = self._extract_basic_features(file_path)
+        
+        # Get advanced features using DeepSeek
+        advanced_features = self._analyze_with_deepseek(file_path)
+        
+        # Combine all features
+        return Track(
+            path=file_path,
+            title=os.path.basename(file_path),
+            **basic_features,
+            **advanced_features
+        )
+    
+    def _extract_basic_features(self, file_path: str) -> Dict[str, Any]:
+        """Extract basic audio features using librosa."""
+        # Load audio file
+        y, sr = librosa.load(file_path)
+        
+        # Extract features
+        tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
+        duration = librosa.get_duration(y=y, sr=sr)
+        
+        # Compute additional features
+        spectral_centroid = librosa.feature.spectral_centroid(y=y, sr=sr)
+        rms_energy = librosa.feature.rms(y=y)
+        
+        return {
+            'bpm': float(tempo),
+            'duration': duration,
+            'spectral_centroid': np.mean(spectral_centroid),
+            'rms_energy': np.mean(rms_energy)
+        }
+    
+    def _analyze_with_deepseek(self, file_path: str) -> Dict[str, Any]:
+        """Use DeepSeek to analyze advanced musical features."""
+        prompt = f"""
+        Analyze this audio track and provide:
+        1. Musical genre
+        2. Energy level (0-1)
+        3. Musical key
+        4. Additional characteristics
+        Based on its acoustic features.
+        """
+        
+        analysis = self.llm.generate(prompt)
+        
+        # TODO: Implement proper response parsing
+        # This is a placeholder implementation
+        return {
+            'genre': 'electronic',
+            'energy': 0.8,
+            'key': 'Am'
+        }
+    
+    def analyze_compatibility(self, track1: Track, track2: Track) -> float:
+        """
+        Analyze the mixing compatibility between two tracks.
+        
+        Returns:
+            Compatibility score between 0 and 1
+        """
+        # Calculate various compatibility factors
+        tempo_comp = 1 - (abs(track1.bpm - track2.bpm) / 20)  # Normalize BPM difference
+        key_comp = 1.0 if track1.is_compatible_key(track2) else 0.0
+        energy_comp = 1 - abs(track1.energy - track2.energy)
+        
+        # Weight the factors
+        weights = {
+            'tempo': 0.4,
+            'key': 0.3,
+            'energy': 0.3
+        }
+        
+        # Calculate weighted score
+        score = (
+            tempo_comp * weights['tempo'] +
+            key_comp * weights['key'] +
+            energy_comp * weights['energy']
+        )
+        
+        return max(0.0, min(1.0, score))  # Clamp between 0 and 1
 ---
+from setuptools import setup, find_packages
 
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
+with open("requirements.txt", "r", encoding="utf-8") as fh:
+    requirements = [line.strip() for line in fh if line.strip() and not line.startswith("#")]
+
+setup(
+    name="ai-dj-agent",
+    version="0.1.0",
+    author="Your Name",
+    author_email="your.email@example.com",
+    description="An AI-powered DJ agent using DeepSeek for music analysis and mixing",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/yourusername/ai-dj-agent",
+    packages=find_packages(),
+    classifiers=[
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+    ],
+    python_requires=">=3.8",
+    install_requires=requirements,
+    entry_points={
+        "console_scripts": [
+            "ai-dj=src.cli:main",
+        ],
+    },
+)
 # 🧪 Custom Testing
 
 Ensure your codebase remains robust by running automated tests.
@@ -285,7 +486,7 @@ If you encouynter any issues or have questions, feel free to reach out:
 
 # 📝 License
 
-This project is licensed under the [MIT](https://opensource.org/license/MIT) License. See the [LICENSE](https://github.com/Katazui/DJAutomation?tab=MIT-1-ov-file#) file for details.
+This project is licensed under the [MIT](https://opensource.org/license/MIT) License
 
 ---
 
@@ -316,5 +517,55 @@ git push origin feature/YourFeature
 5. **Open a Pull Request.**
 
 ---
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-Stay tuned for more features and improvements! Thank you for using DJ Automation CLI. 🎉
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Project specific
+*.mp3
+*.wav
+*.m4a
+*.flac
+.env
+logs/
+output/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Distribution
+.DS_Store
+Thumbs.db
+Stay tuned for more features and improvements! Thank you for using WaveLabs AI. 🎉
