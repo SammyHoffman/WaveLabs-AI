@@ -8,6 +8,7 @@
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Donate-yellow.svg?style=flat)](https://buymeacoffee.com/katazui)
 ![GitHub Forks](https://img.shields.io/github/forks/Katazui/DJAutomation?style=social&label=Fork)
 ![GitHub Stars](https://img.shields.io/github/stars/Katazui/DJAutomation?style=social&label=Stars)
+![1500x500](https://github.com/user-attachments/assets/830e629c-fbf6-473b-996a-8c575827251c)
 
 
 Welcome to the **WaveLabs AI DJ Agent**! An intelligent agent that creates seamless DJ sets by analyzing music characteristics and mixing tracks like a professional DJ. Whether you're managing a personal collection or handling large-scale uploads, WaveLabs has got you covered. 🚀
